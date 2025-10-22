@@ -38,10 +38,12 @@ import { SwitchSpace } from "./switch-space";
 import ExportModal from "@/components/common/export-modal";
 import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sidebar-atom.ts";
 import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts";
+import { useUserRole } from "@/hooks/use-user-role.tsx";
 import { searchSpotlight } from "@/features/search/constants";
 
 export function SpaceSidebar() {
   const { t } = useTranslation();
+  const { isMember } = useUserRole();
   const [tree] = useAtom(treeApiAtom);
   const location = useLocation();
   const [opened, { open: openSettings, close: closeSettings }] =
@@ -117,18 +119,20 @@ export function SpaceSidebar() {
               </div>
             </UnstyledButton>
 
-            <UnstyledButton className={classes.menu} onClick={openSettings}>
-              <div className={classes.menuItemInner}>
-                <IconSettings
-                  size={18}
-                  className={classes.menuItemIcon}
-                  stroke={2}
-                />
-                <span>{t("Space settings")}</span>
-              </div>
-            </UnstyledButton>
+            {!isMember && (
+              <UnstyledButton className={classes.menu} onClick={openSettings}>
+                <div className={classes.menuItemInner}>
+                  <IconSettings
+                    size={18}
+                    className={classes.menuItemIcon}
+                    stroke={2}
+                  />
+                  <span>{t("Space settings")}</span>
+                </div>
+              </UnstyledButton>
+            )}
 
-            {spaceAbility.can(
+            {!isMember && spaceAbility.can(
               SpaceCaslAction.Manage,
               SpaceCaslSubject.Page,
             ) && (
@@ -160,7 +164,7 @@ export function SpaceSidebar() {
               {t("Pages")}
             </Text>
 
-            {spaceAbility.can(
+            {!isMember && spaceAbility.can(
               SpaceCaslAction.Manage,
               SpaceCaslSubject.Page,
             ) && (
@@ -208,6 +212,7 @@ interface SpaceMenuProps {
 }
 function SpaceMenu({ spaceId, onSpaceSettings }: SpaceMenuProps) {
   const { t } = useTranslation();
+  const { isMember } = useUserRole();
   const { spaceSlug } = useParams();
   const [importOpened, { open: openImportModal, close: closeImportModal }] =
     useDisclosure(false);
@@ -234,28 +239,34 @@ function SpaceMenu({ spaceId, onSpaceSettings }: SpaceMenuProps) {
         </Menu.Target>
 
         <Menu.Dropdown>
-          <Menu.Item
-            onClick={openImportModal}
-            leftSection={<IconArrowDown size={16} />}
-          >
-            {t("Import pages")}
-          </Menu.Item>
+          {!isMember && (
+            <>
+              <Menu.Item
+                onClick={openImportModal}
+                leftSection={<IconArrowDown size={16} />}
+              >
+                {t("Import pages")}
+              </Menu.Item>
 
-          <Menu.Item
-            onClick={openExportModal}
-            leftSection={<IconFileExport size={16} />}
-          >
-            {t("Export space")}
-          </Menu.Item>
+              <Menu.Item
+                onClick={openExportModal}
+                leftSection={<IconFileExport size={16} />}
+              >
+                {t("Export space")}
+              </Menu.Item>
 
-          <Menu.Divider />
+              <Menu.Divider />
 
-          <Menu.Item
-            onClick={onSpaceSettings}
-            leftSection={<IconSettings size={16} />}
-          >
-            {t("Space settings")}
-          </Menu.Item>
+              <Menu.Item
+                onClick={onSpaceSettings}
+                leftSection={<IconSettings size={16} />}
+              >
+                {t("Space settings")}
+              </Menu.Item>
+
+              <Menu.Divider />
+            </>
+          )}
 
           <Menu.Item
             component={Link}

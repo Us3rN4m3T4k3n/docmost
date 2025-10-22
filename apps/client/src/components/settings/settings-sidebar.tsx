@@ -160,6 +160,11 @@ export default function SettingsSidebar() {
       return null;
     }
 
+    // Hide Workspace section from Members
+    if (group.heading === "Workspace" && !isAdmin) {
+      return null;
+    }
+
     return (
       <div key={group.heading}>
         <Text c="dimmed" className={classes.linkHeader}>
