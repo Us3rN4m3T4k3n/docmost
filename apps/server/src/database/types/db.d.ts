@@ -309,6 +309,8 @@ export interface Users {
   role: string | null;
   settings: Json | null;
   timezone: string | null;
+  suspendedAt: Timestamp | null;
+  suspensionReason: string | null;
   updatedAt: Generated<Timestamp>;
   workspaceId: string | null;
 }

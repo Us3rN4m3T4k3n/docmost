@@ -5,6 +5,7 @@ import { useSharePageQuery } from "@/features/share/queries/share-query.ts";
 import { Container } from "@mantine/core";
 import React, { useEffect } from "react";
 import ReadonlyPageEditor from "@/features/editor/readonly-page-editor.tsx";
+import ContentProtectionAlways from "@/components/ContentProtectionAlways";
 import { extractPageSlugId } from "@/lib";
 import { Error404 } from "@/components/ui/error-404.tsx";
 import ShareBranding from "@/features/share/components/share-branding.tsx";
@@ -48,12 +49,14 @@ export default function SharedPage() {
       </Helmet>
 
       <Container size={900} p={0}>
-        <ReadonlyPageEditor
-          key={data.page.id}
-          title={data.page.title}
-          content={data.page.content}
-          pageId={data.page.id}
-        />
+        <ContentProtectionAlways>
+          <ReadonlyPageEditor
+            key={data.page.id}
+            title={data.page.title}
+            content={data.page.content}
+            pageId={data.page.id}
+          />
+        </ContentProtectionAlways>
       </Container>
 
       {data && !shareId && !data.hasLicenseKey && <ShareBranding />}

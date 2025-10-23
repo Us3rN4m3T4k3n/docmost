@@ -18,6 +18,7 @@ import {
   ResponsiveSettingsControl,
   ResponsiveSettingsRow,
 } from "@/components/ui/responsive-settings-row.tsx";
+import { useUserRole } from "@/hooks/use-user-role.tsx";
 
 interface SpaceDetailsProps {
   spaceId: string;
@@ -25,6 +26,7 @@ interface SpaceDetailsProps {
 }
 export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
   const { t } = useTranslation();
+  const { isMember } = useUserRole();
   const { data: space, isLoading, refetch } = useSpaceQuery(spaceId);
   const [exportOpened, { open: openExportModal, close: closeExportModal }] =
     useDisclosure(false);
@@ -90,21 +92,27 @@ export default function SpaceDetails({ spaceId, readOnly }: SpaceDetailsProps) {
 
           {!readOnly && (
             <>
-              <Divider my="lg" />
+              {!isMember && (
+                <>
+                  <Divider my="lg" />
 
-              <ResponsiveSettingsRow>
-                <ResponsiveSettingsContent>
-                  <Text size="md">{t("Export space")}</Text>
-                  <Text size="sm" c="dimmed">
-                    {t("Export all pages and attachments in this space.")}
-                  </Text>
-                </ResponsiveSettingsContent>
-                <ResponsiveSettingsControl>
-                  <Button onClick={openExportModal}>{t("Export")}</Button>
-                </ResponsiveSettingsControl>
-              </ResponsiveSettingsRow>
+                  <ResponsiveSettingsRow>
+                    <ResponsiveSettingsContent>
+                      <Text size="md">{t("Export space")}</Text>
+                      <Text size="sm" c="dimmed">
+                        {t("Export all pages and attachments in this space.")}
+                      </Text>
+                    </ResponsiveSettingsContent>
+                    <ResponsiveSettingsControl>
+                      <Button onClick={openExportModal}>{t("Export")}</Button>
+                    </ResponsiveSettingsControl>
+                  </ResponsiveSettingsRow>
 
-              <Divider my="lg" />
+                  <Divider my="lg" />
+                </>
+              )}
+              
+              {isMember && <Divider my="lg" />}
 
               <ResponsiveSettingsRow>
                 <ResponsiveSettingsContent>

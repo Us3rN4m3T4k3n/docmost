@@ -73,6 +73,7 @@ import { mobileSidebarAtom } from "@/components/layouts/global/hooks/atoms/sideb
 import { useToggleSidebar } from "@/components/layouts/global/hooks/hooks/use-toggle-sidebar.ts";
 import CopyPageModal from "../../components/copy-page-modal.tsx";
 import { duplicatePage } from "../../services/page-service.ts";
+import { useUserRole } from "@/hooks/use-user-role.tsx";
 
 interface SpaceTreeProps {
   spaceId: string;
@@ -461,6 +462,7 @@ interface NodeMenuProps {
 
 function NodeMenu({ node, treeApi, spaceId }: NodeMenuProps) {
   const { t } = useTranslation();
+  const { isMember } = useUserRole();
   const clipboard = useClipboard({ timeout: 500 });
   const { spaceSlug } = useParams();
   const { openDeleteModal } = useDeletePageModal();
@@ -577,16 +579,18 @@ function NodeMenu({ node, treeApi, spaceId }: NodeMenuProps) {
             {t("Copy link")}
           </Menu.Item>
 
-          <Menu.Item
-            leftSection={<IconFileExport size={16} />}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              openExportModal();
-            }}
-          >
-            {t("Export page")}
-          </Menu.Item>
+          {!isMember && (
+            <Menu.Item
+              leftSection={<IconFileExport size={16} />}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openExportModal();
+              }}
+            >
+              {t("Export page")}
+            </Menu.Item>
+          )}
 
           {!(treeApi.props.disableEdit as boolean) && (
             <>

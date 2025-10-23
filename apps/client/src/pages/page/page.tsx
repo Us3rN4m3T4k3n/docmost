@@ -13,6 +13,8 @@ import {
 } from "@/features/space/permissions/permissions.type.ts";
 import { useTranslation } from "react-i18next";
 import React from "react";
+import ContentProtection from "@/components/ContentProtection";
+import ScreenshotDetection from "@/components/ScreenshotDetection";
 
 const MemoizedFullEditor = React.memo(FullEditor);
 const MemoizedPageHeader = React.memo(PageHeader);
@@ -54,26 +56,30 @@ export default function Page() {
           <title>{`${page?.icon || ""}  ${page?.title || t("untitled")}`}</title>
         </Helmet>
 
-        <MemoizedPageHeader
-          readOnly={spaceAbility.cannot(
-            SpaceCaslAction.Manage,
-            SpaceCaslSubject.Page,
-          )}
-        />
+      <MemoizedPageHeader
+        readOnly={spaceAbility.cannot(
+          SpaceCaslAction.Manage,
+          SpaceCaslSubject.Page,
+        )}
+      />
 
-        <MemoizedFullEditor
-          key={page.id}
-          pageId={page.id}
-          title={page.title}
-          content={page.content}
-          slugId={page.slugId}
-          spaceSlug={page?.space?.slug}
-          editable={spaceAbility.can(
-            SpaceCaslAction.Manage,
-            SpaceCaslSubject.Page,
-          )}
-        />
-        <MemoizedHistoryModal pageId={page.id} />
+      <ContentProtection>
+        <ScreenshotDetection>
+          <MemoizedFullEditor
+            key={page.id}
+            pageId={page.id}
+            title={page.title}
+            content={page.content}
+            slugId={page.slugId}
+            spaceSlug={page?.space?.slug}
+            editable={spaceAbility.can(
+              SpaceCaslAction.Manage,
+              SpaceCaslSubject.Page,
+            )}
+          />
+        </ScreenshotDetection>
+      </ContentProtection>
+      <MemoizedHistoryModal pageId={page.id} />
       </div>
     )
   );

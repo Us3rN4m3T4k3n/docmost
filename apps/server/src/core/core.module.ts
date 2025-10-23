@@ -15,6 +15,7 @@ import { SpaceModule } from './space/space.module';
 import { GroupModule } from './group/group.module';
 import { CaslModule } from './casl/casl.module';
 import { DomainMiddleware } from '../common/middlewares/domain.middleware';
+import { SuspendedUserMiddleware } from '../common/middlewares/suspended-user.middleware';
 import { ShareModule } from './share/share.module';
 
 @Module({
@@ -34,6 +35,7 @@ import { ShareModule } from './share/share.module';
 })
 export class CoreModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
+    // Domain middleware
     consumer
       .apply(DomainMiddleware)
       .exclude(
@@ -41,6 +43,21 @@ export class CoreModule implements NestModule {
         { path: 'health', method: RequestMethod.GET },
         { path: 'health/live', method: RequestMethod.GET },
         { path: 'billing/stripe/webhook', method: RequestMethod.POST },
+      )
+      .forRoutes('*');
+
+    // Suspended user middleware - block suspended users from all routes except auth
+    consumer
+      .apply(SuspendedUserMiddleware)
+      .exclude(
+        { path: 'auth/login', method: RequestMethod.POST },
+        { path: 'auth/logout', method: RequestMethod.POST },
+        { path: 'auth/setup', method: RequestMethod.POST },
+        { path: 'auth/forgot-password', method: RequestMethod.POST },
+        { path: 'auth/password-reset', method: RequestMethod.POST },
+        { path: 'auth/verify-token', method: RequestMethod.POST },
+        { path: 'health', method: RequestMethod.GET },
+        { path: 'health/live', method: RequestMethod.GET },
       )
       .forRoutes('*');
   }

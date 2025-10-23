@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: docmost-postgres
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: docmost
+      POSTGRES_PASSWORD: docmost_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docmost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: docmost-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: docmost-app
+    ports:
+      - "3000:3000"
+    environment:
+      # Database and Redis URLs
+      DATABASE_URL: postgresql://docmost:docmost_password@postgres:5432/docmost
+      REDIS_URL: redis://redis:6379
+      
+      # App configuration
+      APP_URL: http://localhost:3000
+      APP_SECRET: your-secret-key-here-change-this-in-production
+      PORT: 3000
+      JWT_TOKEN_EXPIRES_IN: 30d
+      
+      # Storage configuration
+      STORAGE_DRIVER: local
+      FILE_UPLOAD_SIZE_LIMIT: 50mb
+      
+      # Mail configuration
+      MAIL_DRIVER: smtp
+      MAIL_FROM_ADDRESS: hello@example.com
+      MAIL_FROM_NAME: Docmost
+      SMTP_HOST: 127.0.0.1
+      SMTP_PORT: 587
+      SMTP_USERNAME: ""
+      SMTP_PASSWORD: ""
+      SMTP_SECURE: false
+      SMTP_IGNORETLS: false
+      
+      # Other settings
+      DISABLE_TELEMETRY: false
+      DEBUG_MODE: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:
+  redis_data:
