@@ -52,7 +52,7 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
     const orientation = widthThreshold ? 'vertical' : 'horizontal';
 
     // Check for Firebug with safe property access
-    const firebugDetected = window.Firebug?.chrome?.isInitialized || false;
+    const firebugDetected = (window as any).Firebug?.chrome?.isInitialized || false;
 
     if (
       (widthThreshold && firebugDetected) ||
