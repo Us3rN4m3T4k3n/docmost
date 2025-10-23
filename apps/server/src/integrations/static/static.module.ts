@@ -79,10 +79,16 @@ export class StaticModule implements OnModuleInit {
         wildcard: false,
       });
 
+      console.log('StaticModule: Static file serving registered');
+      console.log('StaticModule: Setting up catch-all route for:', RENDER_PATH);
+
       app.get(RENDER_PATH, (req: any, res: any) => {
+        console.log('StaticModule: Serving index.html for route:', req.url);
         const stream = fs.createReadStream(indexFilePath);
         res.type('text/html').send(stream);
       });
+
+      console.log('StaticModule: Static serving setup complete');
     } else {
       console.error('StaticModule: Frontend files not found!');
       console.error('StaticModule: Expected clientDistPath:', clientDistPath);
