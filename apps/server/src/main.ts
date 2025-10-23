@@ -12,19 +12,33 @@ import fastifyMultipart from '@fastify/multipart';
 import fastifyCookie from '@fastify/cookie';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter({
-      ignoreTrailingSlash: true,
-      ignoreDuplicateSlashes: true,
-      maxParamLength: 1000,
-      trustProxy: true,
-    }),
-    {
-      rawBody: true,
-      logger: new InternalLogFilter(),
-    },
-  );
+  console.log('🚀 Starting NestJS application...');
+  console.log('📊 Environment check:');
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- PORT:', process.env.PORT);
+  console.log('- DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('- REDIS_URL exists:', !!process.env.REDIS_URL);
+  console.log('- APP_SECRET exists:', !!process.env.APP_SECRET);
+  
+  try {
+    const app = await NestFactory.create<NestFastifyApplication>(
+      AppModule,
+      new FastifyAdapter({
+        ignoreTrailingSlash: true,
+        ignoreDuplicateSlashes: true,
+        maxParamLength: 1000,
+        trustProxy: true,
+      }),
+      {
+        rawBody: true,
+        logger: new InternalLogFilter(),
+      },
+    );
+    console.log('✅ NestJS application created successfully');
+  } catch (error) {
+    console.error('❌ Failed to create NestJS application:', error);
+    throw error;
+  }
 
   app.setGlobalPrefix('api', {
     exclude: ['robots.txt', 'share/:shareId/p/:pageSlug'],
@@ -103,11 +117,22 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 8080;
-  await app.listen(port, '0.0.0.0', () => {
-    logger.log(
-      `Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`,
-    );
-  });
+  console.log(`🌐 Attempting to start server on port ${port}...`);
+  
+  try {
+    await app.listen(port, '0.0.0.0', () => {
+      console.log('✅ Server started successfully!');
+      logger.log(
+        `Listening on http://127.0.0.1:${port} / ${process.env.APP_URL}`,
+      );
+    });
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    throw error;
+  }
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('💥 Bootstrap failed:', error);
+  process.exit(1);
+});
