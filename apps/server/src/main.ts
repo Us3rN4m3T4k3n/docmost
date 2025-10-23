@@ -49,17 +49,20 @@ async function bootstrap() {
   
   // Redis connection with error handling
   try {
+    console.log('🔄 Attempting Redis connection...');
     const redisIoAdapter = new WsRedisIoAdapter(app);
     await redisIoAdapter.connectToRedis();
     app.useWebSocketAdapter(redisIoAdapter);
-    console.log('Redis WebSocket adapter connected successfully');
+    console.log('✅ Redis WebSocket adapter connected successfully');
   } catch (error) {
-    console.error('Redis connection failed, continuing without WebSocket adapter:', error);
+    console.error('❌ Redis connection failed, continuing without WebSocket adapter:', error);
     // Continue without Redis for basic functionality
   }
 
+  console.log('🔄 Registering middleware...');
   await app.register(fastifyMultipart);
   await app.register(fastifyCookie);
+  console.log('✅ Middleware registered successfully');
 
   app
     .getHttpAdapter()
