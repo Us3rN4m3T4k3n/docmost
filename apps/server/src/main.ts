@@ -20,8 +20,9 @@ async function bootstrap() {
   console.log('- REDIS_URL exists:', !!process.env.REDIS_URL);
   console.log('- APP_SECRET exists:', !!process.env.APP_SECRET);
   
+  let app: NestFastifyApplication;
   try {
-    const app = await NestFactory.create<NestFastifyApplication>(
+    app = await NestFactory.create<NestFastifyApplication>(
       AppModule,
       new FastifyAdapter({
         ignoreTrailingSlash: true,
