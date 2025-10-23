@@ -13,7 +13,7 @@ import { plainToInstance } from 'class-transformer';
 import { IsISO6391 } from '../../common/validator/is-iso6391';
 
 export class EnvironmentVariables {
-  @IsNotEmpty()
+  @IsOptional()
   @IsUrl(
     {
       protocols: ['postgres', 'postgresql'],
@@ -22,9 +22,9 @@ export class EnvironmentVariables {
     },
     { message: 'DATABASE_URL must be a valid postgres connection string' },
   )
-  DATABASE_URL: string;
+  DATABASE_URL?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsUrl(
     {
       protocols: ['redis', 'rediss'],
@@ -33,16 +33,16 @@ export class EnvironmentVariables {
     },
     { message: 'REDIS_URL must be a valid redis connection string' },
   )
-  REDIS_URL: string;
+  REDIS_URL?: string;
 
   @IsOptional()
   @IsUrl({ protocols: ['http', 'https'], require_tld: false })
   APP_URL: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(32)
   @IsNotIn(['REPLACE_WITH_LONG_SECRET'])
-  APP_SECRET: string;
+  APP_SECRET?: string;
 
   @IsOptional()
   @IsIn(['smtp', 'postmark'])
