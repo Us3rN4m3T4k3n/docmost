@@ -3,6 +3,17 @@ import { useUserRole } from '@/hooks/use-user-role';
 import api from '@/lib/api-client';
 import './ContentProtection.css';
 
+// Extend Window interface to include Firebug
+declare global {
+  interface Window {
+    Firebug?: {
+      chrome?: {
+        isInitialized?: boolean;
+      };
+    };
+  }
+}
+
 interface ContentProtectionProps {
   children: React.ReactNode;
 }
@@ -40,8 +51,11 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
     const heightThreshold = window.outerHeight - window.innerHeight > 160;
     const orientation = widthThreshold ? 'vertical' : 'horizontal';
 
+    // Check for Firebug with safe property access
+    const firebugDetected = window.Firebug?.chrome?.isInitialized || false;
+
     if (
-      (widthThreshold && window.Firebug?.chrome?.isInitialized) ||
+      (widthThreshold && firebugDetected) ||
       widthThreshold ||
       heightThreshold
     ) {
