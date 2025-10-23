@@ -23,6 +23,7 @@ export class StaticModule implements OnModuleInit {
       '..',
       '..',
       '..',
+      '..',
       'client',
       'dist',
     );
