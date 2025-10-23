@@ -22,7 +22,9 @@ export class StaticModule implements OnModuleInit {
       '..',
       '..',
       '..',
-      'client/dist',
+      'apps',
+      'client',
+      'dist',
     );
 
     const indexFilePath = join(clientDistPath, 'index.html');
