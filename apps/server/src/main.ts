@@ -31,10 +31,17 @@ async function bootstrap() {
   });
 
   const reflector = app.get(Reflector);
-  const redisIoAdapter = new WsRedisIoAdapter(app);
-  await redisIoAdapter.connectToRedis();
-
-  app.useWebSocketAdapter(redisIoAdapter);
+  
+  // Redis connection with error handling
+  try {
+    const redisIoAdapter = new WsRedisIoAdapter(app);
+    await redisIoAdapter.connectToRedis();
+    app.useWebSocketAdapter(redisIoAdapter);
+    console.log('Redis WebSocket adapter connected successfully');
+  } catch (error) {
+    console.error('Redis connection failed, continuing without WebSocket adapter:', error);
+    // Continue without Redis for basic functionality
+  }
 
   await app.register(fastifyMultipart);
   await app.register(fastifyCookie);
