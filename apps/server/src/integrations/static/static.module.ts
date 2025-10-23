@@ -13,6 +13,8 @@ export class StaticModule implements OnModuleInit {
   ) {}
 
   public async onModuleInit() {
+    console.log('StaticModule: Starting static file setup...');
+    
     const httpAdapter = this.httpAdapterHost.httpAdapter;
     const app = httpAdapter.getInstance();
 
@@ -29,7 +31,14 @@ export class StaticModule implements OnModuleInit {
 
     const indexFilePath = join(clientDistPath, 'index.html');
 
+    console.log('StaticModule: Checking for frontend files...');
+    console.log('StaticModule: clientDistPath:', clientDistPath);
+    console.log('StaticModule: indexFilePath:', indexFilePath);
+    console.log('StaticModule: clientDistPath exists:', fs.existsSync(clientDistPath));
+    console.log('StaticModule: indexFilePath exists:', fs.existsSync(indexFilePath));
+    
     if (fs.existsSync(clientDistPath) && fs.existsSync(indexFilePath)) {
+      console.log('StaticModule: Frontend files found, setting up static serving...');
       const indexTemplateFilePath = join(clientDistPath, 'index-template.html');
       const windowVar = '<!--window-config-->';
 
@@ -75,6 +84,18 @@ export class StaticModule implements OnModuleInit {
         const stream = fs.createReadStream(indexFilePath);
         res.type('text/html').send(stream);
       });
+    } else {
+      console.error('StaticModule: Frontend files not found!');
+      console.error('StaticModule: Expected clientDistPath:', clientDistPath);
+      console.error('StaticModule: Expected indexFilePath:', indexFilePath);
+      
+      // List what's actually in the directory
+      try {
+        const parentDir = join(clientDistPath, '..');
+        console.error('StaticModule: Parent directory contents:', fs.readdirSync(parentDir));
+      } catch (err) {
+        console.error('StaticModule: Cannot read parent directory:', err);
+      }
     }
   }
 }
