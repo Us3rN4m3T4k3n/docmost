@@ -113,8 +113,16 @@ export function validate(config: Record<string, any>) {
       'The Environment variables has failed the following validations:',
     );
 
-    errors.map((error) => {
-      console.error(JSON.stringify(error.constraints));
+    errors.forEach((error) => {
+      console.error(`❌ ${error.property}:`);
+      if (error.constraints) {
+        Object.entries(error.constraints).forEach(([key, message]) => {
+          console.error(`   - ${key}: ${message}`);
+        });
+      }
+      if (error.value !== undefined) {
+        console.error(`   - Current value: ${error.value}`);
+      }
     });
 
     console.error(
