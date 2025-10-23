@@ -21,6 +21,12 @@ export function getServerAppUrl(): string {
 }
 
 export function getBackendUrl(): string {
+  // If we have a server URL configured, use it
+  const serverUrl = getServerAppUrl();
+  if (serverUrl) {
+    return serverUrl + "/api";
+  }
+  // Otherwise, use the current app URL
   return getAppUrl() + "/api";
 }
 

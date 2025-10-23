@@ -1,9 +1,9 @@
 import axios, { AxiosInstance } from "axios";
 import APP_ROUTE from "@/lib/app-route.ts";
-import { isCloud } from "@/lib/config.ts";
+import { isCloud, getBackendUrl } from "@/lib/config.ts";
 
 const api: AxiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: getBackendUrl(),
   withCredentials: true,
 });
 
