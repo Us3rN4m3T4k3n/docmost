@@ -38,7 +38,11 @@ export class EnvironmentService {
   }
 
   getAppSecret(): string {
-    return this.configService.get<string>('APP_SECRET');
+    const secret = this.configService.get<string>('APP_SECRET');
+    if (!secret) {
+      throw new Error('APP_SECRET environment variable is required but not provided');
+    }
+    return secret;
   }
 
   getDatabaseURL(): string {
