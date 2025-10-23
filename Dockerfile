@@ -43,6 +43,6 @@ RUN pnpm install --frozen-lockfile
 
 RUN mkdir -p /app/data/storage
 
-EXPOSE 3000
+EXPOSE 8080
 
-CMD ["pnpm", "start"]
+CMD ["pnpm", "--filter", "server", "start:prod"]
