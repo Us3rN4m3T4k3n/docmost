@@ -72,6 +72,7 @@ export class StaticModule implements OnModuleInit {
 
       fs.writeFileSync(indexFilePath, transformedHtml);
 
+      // Register static files with wildcard disabled
       await app.register(fastifyStatic, {
         root: clientDistPath,
         wildcard: false,
@@ -80,27 +81,41 @@ export class StaticModule implements OnModuleInit {
 
       console.log('StaticModule: Static file serving registered');
 
-      // Set up catch-all route for SPA routing (non-API routes)
-      // This must be registered after fastifyStatic to avoid conflicts
-      app.setNotFoundHandler((req: any, res: any) => {
-        // Skip API routes and other excluded paths
-        if (
-          req.url.startsWith('/api') ||
-          req.url.startsWith('/socket.io') ||
-          req.url.startsWith('/collab') ||
-          req.url === '/robots.txt'
-        ) {
-          res.code(404).send({ message: 'Not found' });
-          return;
+      // Use preSerialization hook to intercept 404s and serve index.html for SPA routing
+      // This runs after route matching but before serializing the response
+      app.addHook('preSerialization', async (request: any, reply: any, payload: any) => {
+        // Only process GET requests that resulted in 404
+        if (request.method !== 'GET' || reply.statusCode !== 404) {
+          return payload;
         }
 
-        // Serve index.html for all other routes (SPA routing)
-        console.log('StaticModule: Serving index.html for SPA route:', req.url);
-        const stream = fs.createReadStream(indexFilePath);
-        res.type('text/html').send(stream);
+        // Skip API routes and other excluded paths
+        if (
+          request.url.startsWith('/api') ||
+          request.url.startsWith('/socket.io') ||
+          request.url.startsWith('/collab') ||
+          request.url === '/robots.txt' ||
+          request.url.startsWith('/share/')
+        ) {
+          return payload; // Return 404 for these
+        }
+
+        // Check if the requested path exists as a static file
+        const requestedPath = join(clientDistPath, request.url.split('?')[0]);
+        const fileExists = fs.existsSync(requestedPath) && fs.statSync(requestedPath).isFile();
+        
+        // If file doesn't exist, serve index.html for SPA routing
+        if (!fileExists) {
+          console.log('StaticModule: Serving index.html for SPA route:', request.url);
+          reply.code(200);
+          reply.type('text/html');
+          return fs.readFileSync(indexFilePath, 'utf8');
+        }
+        
+        return payload;
       });
 
-      console.log('StaticModule: SPA catch-all handler registered');
+      console.log('StaticModule: SPA routing hook registered');
       console.log('StaticModule: Static serving setup complete');
     } else {
       console.error('StaticModule: Frontend files not found!');
