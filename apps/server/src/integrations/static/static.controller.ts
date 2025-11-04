@@ -27,8 +27,9 @@ export class StaticController {
     return this.serveIndexHtml(reply);
   }
 
-  // Catch-all for SPA routes using a parameter that matches everything
-  @Get('*')
+  // Catch-all for SPA routes using parameter pattern
+  // This will match any path like /setup/register, /home, etc.
+  @Get(':path*')
   serveSpaRoute(@Res() reply: FastifyReply) {
     // Skip API routes, socket.io, collab, and share routes
     const url = reply.request.url;
