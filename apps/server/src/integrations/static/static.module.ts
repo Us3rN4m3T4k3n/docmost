@@ -4,8 +4,11 @@ import { join } from 'path';
 import * as fs from 'node:fs';
 import fastifyStatic from '@fastify/static';
 import { EnvironmentService } from '../environment/environment.service';
+import { StaticController } from './static.controller';
 
-@Module({})
+@Module({
+  controllers: [StaticController],
+})
 export class StaticModule implements OnApplicationBootstrap {
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
