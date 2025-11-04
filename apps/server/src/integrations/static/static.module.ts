@@ -4,11 +4,8 @@ import { join } from 'path';
 import * as fs from 'node:fs';
 import fastifyStatic from '@fastify/static';
 import { EnvironmentService } from '../environment/environment.service';
-import { StaticController } from './static.controller';
 
-@Module({
-  controllers: [StaticController],
-})
+@Module({})
 export class StaticModule implements OnApplicationBootstrap {
   constructor(
     private readonly httpAdapterHost: HttpAdapterHost,
@@ -85,7 +82,81 @@ export class StaticModule implements OnApplicationBootstrap {
       });
 
       console.log('StaticModule: Static file serving registered');
-      console.log('StaticModule: SPA routes are handled by StaticController');
+
+      // Register Fastify routes for SPA routing after NestJS routes
+      // This ensures unmatched routes are caught and served index.html
+      const serveIndexHtml = async (request: any, reply: any) => {
+        try {
+          // Skip API routes, socket.io, collab, and share routes
+          if (
+            request.url.startsWith('/api') ||
+            request.url.startsWith('/socket.io') ||
+            request.url.startsWith('/collab') ||
+            request.url === '/robots.txt' ||
+            request.url.startsWith('/share/')
+          ) {
+            reply.code(404);
+            reply.send({ message: `Cannot ${request.method} ${request.url}`, error: 'Not Found', statusCode: 404 });
+            return;
+          }
+
+          // Check if the requested path exists as a static file
+          const requestedPath = join(clientDistPath, request.url.split('?')[0]);
+          const fileExists = fs.existsSync(requestedPath) && fs.statSync(requestedPath).isFile();
+          
+          // If file exists, let Fastify static serve it
+          if (fileExists) {
+            return reply.sendFile(request.url.split('?')[0]);
+          }
+
+          // Read and transform the HTML
+          const indexTemplateFilePath = join(clientDistPath, 'index-template.html');
+          const windowVar = '<!--window-config-->';
+
+          const configString = {
+            ENV: this.environmentService.getNodeEnv(),
+            APP_URL: this.environmentService.getAppUrl(),
+            CLOUD: this.environmentService.isCloud(),
+            FILE_UPLOAD_SIZE_LIMIT: this.environmentService.getFileUploadSizeLimit(),
+            FILE_IMPORT_SIZE_LIMIT: this.environmentService.getFileImportSizeLimit(),
+            DRAWIO_URL: this.environmentService.getDrawioUrl(),
+            SUBDOMAIN_HOST: this.environmentService.isCloud()
+              ? this.environmentService.getSubdomainHost()
+              : undefined,
+            COLLAB_URL: this.environmentService.getCollabUrl(),
+            BILLING_TRIAL_DAYS: this.environmentService.isCloud()
+              ? this.environmentService.getBillingTrialDays()
+              : undefined,
+            POSTHOG_HOST: this.environmentService.getPostHogHost(),
+            POSTHOG_KEY: this.environmentService.getPostHogKey(),
+          };
+
+          const windowScriptContent = `<script>window.CONFIG=${JSON.stringify(configString)};</script>`;
+
+          if (!fs.existsSync(indexTemplateFilePath)) {
+            fs.copyFileSync(indexFilePath, indexTemplateFilePath);
+          }
+
+          const html = fs.readFileSync(indexTemplateFilePath, 'utf8');
+          const transformedHtml = html.replace(windowVar, windowScriptContent);
+
+          reply.type('text/html');
+          reply.send(transformedHtml);
+        } catch (error) {
+          console.error('StaticModule: Error serving index.html:', error);
+          reply.code(500);
+          reply.send({ message: 'Internal server error', error: 'Internal Server Error', statusCode: 500 });
+        }
+      };
+
+      // Register root route
+      app.get('/', serveIndexHtml);
+
+      // Register catch-all route for SPA routing
+      // This must be registered after all NestJS routes
+      app.get('*', serveIndexHtml);
+
+      console.log('StaticModule: SPA routes registered (root and catch-all via Fastify)');
       console.log('StaticModule: Static serving setup complete');
     } else {
       console.error('StaticModule: Frontend files not found!');
