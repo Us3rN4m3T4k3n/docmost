@@ -24,7 +24,7 @@ export class StaticController {
 
   @Get()
   serveRoot(@Res() reply: FastifyReply) {
-    return this.serveIndexHtml(reply);
+    this.serveIndexHtml(reply);
   }
 
   // Catch-all for SPA routes using parameter pattern
@@ -41,50 +41,58 @@ export class StaticController {
       url.startsWith('/share/')
     ) {
       reply.code(404);
-      return { message: `Cannot GET ${url}`, error: 'Not Found', statusCode: 404 };
+      reply.send({ message: `Cannot GET ${url}`, error: 'Not Found', statusCode: 404 });
+      return;
     }
-    return this.serveIndexHtml(reply);
+    this.serveIndexHtml(reply);
   }
 
   private serveIndexHtml(reply: FastifyReply) {
-    if (!fs.existsSync(this.indexFilePath)) {
-      reply.code(404);
-      return { message: 'Frontend not found', error: 'Not Found', statusCode: 404 };
+    try {
+      if (!fs.existsSync(this.indexFilePath)) {
+        reply.code(404);
+        reply.send({ message: 'Frontend not found', error: 'Not Found', statusCode: 404 });
+        return;
+      }
+
+      // Read and transform the HTML
+      const indexTemplateFilePath = join(this.clientDistPath, 'index-template.html');
+      const windowVar = '<!--window-config-->';
+
+      const configString = {
+        ENV: this.environmentService.getNodeEnv(),
+        APP_URL: this.environmentService.getAppUrl(),
+        CLOUD: this.environmentService.isCloud(),
+        FILE_UPLOAD_SIZE_LIMIT: this.environmentService.getFileUploadSizeLimit(),
+        FILE_IMPORT_SIZE_LIMIT: this.environmentService.getFileImportSizeLimit(),
+        DRAWIO_URL: this.environmentService.getDrawioUrl(),
+        SUBDOMAIN_HOST: this.environmentService.isCloud()
+          ? this.environmentService.getSubdomainHost()
+          : undefined,
+        COLLAB_URL: this.environmentService.getCollabUrl(),
+        BILLING_TRIAL_DAYS: this.environmentService.isCloud()
+          ? this.environmentService.getBillingTrialDays()
+          : undefined,
+        POSTHOG_HOST: this.environmentService.getPostHogHost(),
+        POSTHOG_KEY: this.environmentService.getPostHogKey(),
+      };
+
+      const windowScriptContent = `<script>window.CONFIG=${JSON.stringify(configString)};</script>`;
+
+      if (!fs.existsSync(indexTemplateFilePath)) {
+        fs.copyFileSync(this.indexFilePath, indexTemplateFilePath);
+      }
+
+      const html = fs.readFileSync(indexTemplateFilePath, 'utf8');
+      const transformedHtml = html.replace(windowVar, windowScriptContent);
+
+      reply.type('text/html');
+      reply.send(transformedHtml);
+    } catch (error) {
+      console.error('StaticController: Error serving index.html:', error);
+      reply.code(500);
+      reply.send({ message: 'Internal server error', error: 'Internal Server Error', statusCode: 500 });
     }
-
-    // Read and transform the HTML
-    const indexTemplateFilePath = join(this.clientDistPath, 'index-template.html');
-    const windowVar = '<!--window-config-->';
-
-    const configString = {
-      ENV: this.environmentService.getNodeEnv(),
-      APP_URL: this.environmentService.getAppUrl(),
-      CLOUD: this.environmentService.isCloud(),
-      FILE_UPLOAD_SIZE_LIMIT: this.environmentService.getFileUploadSizeLimit(),
-      FILE_IMPORT_SIZE_LIMIT: this.environmentService.getFileImportSizeLimit(),
-      DRAWIO_URL: this.environmentService.getDrawioUrl(),
-      SUBDOMAIN_HOST: this.environmentService.isCloud()
-        ? this.environmentService.getSubdomainHost()
-        : undefined,
-      COLLAB_URL: this.environmentService.getCollabUrl(),
-      BILLING_TRIAL_DAYS: this.environmentService.isCloud()
-        ? this.environmentService.getBillingTrialDays()
-        : undefined,
-      POSTHOG_HOST: this.environmentService.getPostHogHost(),
-      POSTHOG_KEY: this.environmentService.getPostHogKey(),
-    };
-
-    const windowScriptContent = `<script>window.CONFIG=${JSON.stringify(configString)};</script>`;
-
-    if (!fs.existsSync(indexTemplateFilePath)) {
-      fs.copyFileSync(this.indexFilePath, indexTemplateFilePath);
-    }
-
-    const html = fs.readFileSync(indexTemplateFilePath, 'utf8');
-    const transformedHtml = html.replace(windowVar, windowScriptContent);
-
-    reply.type('text/html');
-    return transformedHtml;
   }
 }
 
