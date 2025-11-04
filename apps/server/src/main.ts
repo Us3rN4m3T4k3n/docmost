@@ -106,26 +106,10 @@ async function bootstrap() {
     }),
   );
 
-  // Configure CORS to allow requests from the same origin and with credentials
+  // Configure CORS to allow all origins (simplified for Railway deployment)
+  // In production, Railway handles routing, so we allow all origins
   app.enableCors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, Postman)
-      if (!origin) return callback(null, true);
-      
-      // Allow all Railway domains
-      if (origin.includes('railway.app') || origin.includes('railway.com')) {
-        return callback(null, true);
-      }
-      
-      // Allow requests from the same origin as APP_URL
-      const appUrl = process.env.APP_URL;
-      if (appUrl && origin === appUrl.replace(/\/$/, '')) {
-        return callback(null, true);
-      }
-      
-      // Allow the origin
-      callback(null, true);
-    },
+    origin: true, // Allow all origins
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
