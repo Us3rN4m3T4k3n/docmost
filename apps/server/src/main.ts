@@ -35,6 +35,18 @@ async function bootstrap() {
         logger: new InternalLogFilter(),
       },
     );
+    
+    // Disable NestJS default 404 handler so we can use our own for SPA routing
+    const httpAdapter = app.getHttpAdapter();
+    const fastifyInstance = httpAdapter.getInstance();
+    // Remove any existing not-found handler that NestJS might have set
+    if (fastifyInstance.hasNotFoundHandler) {
+      try {
+        fastifyInstance.setNotFoundHandler(async () => {});
+      } catch (e) {
+        // Ignore if already set
+      }
+    }
     console.log('✅ NestJS application created successfully');
   } catch (error) {
     console.error('❌ Failed to create NestJS application:', error);

@@ -72,16 +72,55 @@ export class StaticModule implements OnModuleInit {
 
       fs.writeFileSync(indexFilePath, transformedHtml);
 
-      // Register static files with wildcard enabled for SPA routing
-      // This automatically serves index.html for non-file routes
+      // Register static files with wildcard disabled
+      // We'll handle SPA routing manually to avoid conflicts with NestJS routes
       await app.register(fastifyStatic, {
         root: clientDistPath,
-        wildcard: true,
-        index: 'index.html',
+        wildcard: false,
         prefix: '/',
       });
 
-      console.log('StaticModule: Static file serving registered with SPA routing');
+      console.log('StaticModule: Static file serving registered');
+
+      // Use setNotFoundHandler to serve index.html for SPA routes
+      // This catches 404s from NestJS and serves the frontend
+      // We need to wait for NestJS to finish initialization, so we use a small delay
+      setImmediate(() => {
+        try {
+          app.setNotFoundHandler(async (request: any, reply: any) => {
+            // Skip API routes, socket.io, collab, and share routes
+            if (
+              request.url.startsWith('/api') ||
+              request.url.startsWith('/socket.io') ||
+              request.url.startsWith('/collab') ||
+              request.url === '/robots.txt' ||
+              request.url.startsWith('/share/')
+            ) {
+              reply.code(404);
+              return { message: `Cannot ${request.method} ${request.url}`, error: 'Not Found', statusCode: 404 };
+            }
+
+            // Check if the requested path exists as a static file
+            const requestedPath = join(clientDistPath, request.url.split('?')[0]);
+            const fileExists = fs.existsSync(requestedPath) && fs.statSync(requestedPath).isFile();
+            
+            // If file exists, let Fastify static serve it (shouldn't happen, but safety check)
+            if (fileExists) {
+              return reply.sendFile(request.url.split('?')[0]);
+            }
+            
+            // Otherwise, serve index.html for SPA routing
+            console.log('StaticModule: Serving index.html for SPA route:', request.url);
+            reply.type('text/html');
+            return fs.readFileSync(indexFilePath, 'utf8');
+          });
+          console.log('StaticModule: SPA not-found handler registered');
+        } catch (error) {
+          console.error('StaticModule: Failed to set not-found handler:', error);
+          console.error('StaticModule: Error details:', error.message);
+        }
+      });
+
       console.log('StaticModule: Static serving setup complete');
     } else {
       console.error('StaticModule: Frontend files not found!');
