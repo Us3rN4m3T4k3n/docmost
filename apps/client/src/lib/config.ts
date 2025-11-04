@@ -21,13 +21,42 @@ export function getServerAppUrl(): string {
 }
 
 export function getBackendUrl(): string {
-  // If we have a server URL configured, use it
+  // In production, if the client is served from the same origin as the API,
+  // use relative URLs to avoid CORS issues
+  // This handles the case where client and server are on the same domain
+  const currentOrigin = window.location.origin;
   const serverUrl = getServerAppUrl();
-  if (serverUrl) {
-    return serverUrl + "/api";
+  
+  // If no server URL is configured, use relative URLs (same-origin)
+  if (!serverUrl) {
+    return "/api";
   }
-  // Otherwise, use the current app URL
-  return getAppUrl() + "/api";
+  
+  try {
+    const serverUrlObj = new URL(serverUrl);
+    
+    // If server URL matches current origin, use relative URLs (same-origin)
+    if (serverUrlObj.origin === currentOrigin) {
+      return "/api";
+    }
+    
+    // If server URL is different, check if it's a Railway domain
+    // and we're also on a Railway domain - use relative URLs to avoid CORS
+    const isRailwayDomain = currentOrigin.includes('railway.app') || currentOrigin.includes('railway.com');
+    const serverIsRailwayDomain = serverUrlObj.hostname.includes('railway.app') || serverUrlObj.hostname.includes('railway.com');
+    
+    // If both are Railway domains but different, use relative URLs
+    // (client and server are on same Railway deployment)
+    if (isRailwayDomain && serverIsRailwayDomain) {
+      return "/api";
+    }
+    
+    // Otherwise, use the configured server URL (cross-origin)
+    return serverUrl + "/api";
+  } catch {
+    // If URL parsing fails, use relative URLs as fallback
+    return "/api";
+  }
 }
 
 export function getCollaborationUrl(): string {
