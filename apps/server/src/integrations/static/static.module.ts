@@ -75,12 +75,13 @@ export class StaticModule implements OnApplicationBootstrap {
 
       fs.writeFileSync(indexFilePath, transformedHtml);
 
-      // Register static files with wildcard disabled
-      // We'll handle SPA routing manually to avoid conflicts with NestJS routes
+      // Register static files with wildcard disabled and index disabled
+      // We'll handle index.html and SPA routing via NestJS controller to avoid conflicts
       await app.register(fastifyStatic, {
         root: clientDistPath,
         wildcard: false,
         prefix: '/',
+        index: false, // Disable automatic index.html serving - handled by controller
       });
 
       console.log('StaticModule: Static file serving registered');
