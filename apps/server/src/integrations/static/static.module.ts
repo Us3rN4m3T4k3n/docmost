@@ -74,12 +74,33 @@ export class StaticModule implements OnModuleInit {
 
       await app.register(fastifyStatic, {
         root: clientDistPath,
-        wildcard: true,
-        // Serve index.html for all non-file routes (SPA routing)
-        index: 'index.html',
+        wildcard: false,
+        prefix: '/',
       });
 
-      console.log('StaticModule: Static file serving registered with wildcard enabled');
+      console.log('StaticModule: Static file serving registered');
+
+      // Set up catch-all route for SPA routing (non-API routes)
+      // This must be registered after fastifyStatic to avoid conflicts
+      app.setNotFoundHandler((req: any, res: any) => {
+        // Skip API routes and other excluded paths
+        if (
+          req.url.startsWith('/api') ||
+          req.url.startsWith('/socket.io') ||
+          req.url.startsWith('/collab') ||
+          req.url === '/robots.txt'
+        ) {
+          res.code(404).send({ message: 'Not found' });
+          return;
+        }
+
+        // Serve index.html for all other routes (SPA routing)
+        console.log('StaticModule: Serving index.html for SPA route:', req.url);
+        const stream = fs.createReadStream(indexFilePath);
+        res.type('text/html').send(stream);
+      });
+
+      console.log('StaticModule: SPA catch-all handler registered');
       console.log('StaticModule: Static serving setup complete');
     } else {
       console.error('StaticModule: Frontend files not found!');
