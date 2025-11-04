@@ -76,7 +76,7 @@ export class StaticModule implements OnModuleInit {
 
       await app.register(fastifyStatic, {
         root: clientDistPath,
-        wildcard: false,
+        wildcard: true,
       });
 
       console.log('StaticModule: Static file serving registered');
