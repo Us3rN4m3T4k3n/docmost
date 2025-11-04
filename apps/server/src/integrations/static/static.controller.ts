@@ -3,6 +3,7 @@ import { FastifyReply } from 'fastify';
 import { join } from 'path';
 import * as fs from 'node:fs';
 import { EnvironmentService } from '../environment/environment.service';
+import { SkipTransform } from '../../common/decorators/skip-transform.decorator';
 
 @Controller()
 export class StaticController {
@@ -22,6 +23,7 @@ export class StaticController {
     this.indexFilePath = join(this.clientDistPath, 'index.html');
   }
 
+  @SkipTransform()
   @Get()
   serveRoot(@Res() reply: FastifyReply) {
     this.serveIndexHtml(reply);
@@ -29,6 +31,7 @@ export class StaticController {
 
   // Catch-all for SPA routes using parameter pattern
   // This will match any path like /setup/register, /home, etc.
+  @SkipTransform()
   @Get(':path*')
   serveSpaRoute(@Res() reply: FastifyReply) {
     // Skip API routes, socket.io, collab, and share routes
