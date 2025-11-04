@@ -117,7 +117,7 @@ export class StaticModule implements OnModuleInit {
           console.log('StaticModule: SPA not-found handler registered');
         } catch (error) {
           console.error('StaticModule: Failed to set not-found handler:', error);
-          console.error('StaticModule: Error details:', error.message);
+          console.error('StaticModule: Error details:', error instanceof Error ? error.message : String(error));
         }
       });
 
