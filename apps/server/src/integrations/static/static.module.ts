@@ -106,7 +106,7 @@ export class StaticModule implements OnApplicationBootstrap {
           
           // If file exists, let Fastify static serve it
           if (fileExists) {
-            return reply.sendFile(request.url.split('?')[0]);
+            return reply.sendFile(requestedPath);
           }
 
           // Read and transform the HTML
