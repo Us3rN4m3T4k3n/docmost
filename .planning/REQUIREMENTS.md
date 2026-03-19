@@ -107,46 +107,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ROLE-01 | Phase 1 | Pending |
 | ROLE-02 | Phase 1 | Pending |
 | ROLE-03 | Phase 1 | Pending |
-| LANG-01 | Phase 2 | Pending |
-| LANG-02 | Phase 2 | Pending |
-| LANG-03 | Phase 2 | Pending |
-| LANG-04 | Phase 2 | Pending |
-| LANG-05 | Phase 2 | Pending |
 | ISOL-01 | Phase 1 | Pending |
 | ISOL-02 | Phase 1 | Pending |
 | ISOL-03 | Phase 1 | Pending |
 | ISOL-04 | Phase 1 | Pending |
 | ISOL-05 | Phase 1 | Pending |
-| PROT-01 | Phase 2 | Pending |
-| PROT-02 | Phase 2 | Pending |
-| PROT-03 | Phase 2 | Pending |
-| PROT-04 | Phase 2 | Pending |
-| PROT-05 | Phase 2 | Pending |
-| PROT-06 | Phase 2 | Pending |
-| BILL-01 | Phase 3 | Pending |
-| BILL-02 | Phase 3 | Pending |
-| BILL-03 | Phase 3 | Pending |
-| BILL-04 | Phase 3 | Pending |
-| BILL-05 | Phase 3 | Pending |
-| BILL-06 | Phase 3 | Pending |
-| BILL-07 | Phase 3 | Pending |
-| BILL-08 | Phase 3 | Pending |
-| BILL-09 | Phase 3 | Pending |
-| ADMIN-01 | Phase 3 | Pending |
-| ADMIN-02 | Phase 3 | Pending |
-| ADMIN-03 | Phase 3 | Pending |
-| DEPLOY-01 | Phase 4 | Pending |
-| DEPLOY-02 | Phase 4 | Pending |
-| DEPLOY-03 | Phase 4 | Pending |
-| DEPLOY-04 | Phase 4 | Pending |
-| DEPLOY-05 | Phase 4 | Pending |
-| DEPLOY-06 | Phase 4 | Pending |
+| LANG-01 | Phase 2 | Pending |
+| LANG-02 | Phase 2 | Pending |
+| LANG-03 | Phase 2 | Pending |
+| LANG-04 | Phase 2 | Pending |
+| LANG-05 | Phase 2 | Pending |
+| PROT-01 | Phase 3 | Pending |
+| PROT-02 | Phase 3 | Pending |
+| PROT-03 | Phase 3 | Pending |
+| PROT-04 | Phase 3 | Pending |
+| PROT-05 | Phase 3 | Pending |
+| PROT-06 | Phase 3 | Pending |
+| BILL-01 | Phase 4 | Pending |
+| BILL-02 | Phase 4 | Pending |
+| BILL-03 | Phase 4 | Pending |
+| BILL-04 | Phase 4 | Pending |
+| BILL-05 | Phase 4 | Pending |
+| BILL-06 | Phase 4 | Pending |
+| BILL-07 | Phase 4 | Pending |
+| BILL-08 | Phase 4 | Pending |
+| BILL-09 | Phase 4 | Pending |
+| ADMIN-01 | Phase 4 | Pending |
+| ADMIN-02 | Phase 4 | Pending |
+| ADMIN-03 | Phase 4 | Pending |
+| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-02 | Phase 5 | Pending |
+| DEPLOY-03 | Phase 5 | Pending |
+| DEPLOY-04 | Phase 5 | Pending |
+| DEPLOY-05 | Phase 5 | Pending |
+| DEPLOY-06 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 36 total
-- Mapped to phases: 36
+- v1 requirements: 37 total
+- Mapped to phases: 37
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after adding language localization, internal role levels, subscription payment failure locking, and Kiwify deferred note*
+*Last updated: 2026-03-19 — Traceability updated after roadmap creation (5-phase structure; PROT moved to Phase 3, BILL/ADMIN to Phase 4, DEPLOY to Phase 5)*
