@@ -148,7 +148,9 @@
     "moduleNameMapper": {
       "^@docmost/db/(.*)$": "<rootDir>/database/$1",
       "^@docmost/transactional/(.*)$": "<rootDir>/integrations/transactional/$1",
-      "^@docmost/ee/(.*)$": "<rootDir>/ee/$1"
+      "^@docmost/ee/(.*)$": "<rootDir>/ee/$1",
+      "^(\\./.*)\\.js$": "$1",
+      "^src/(.*)$": "<rootDir>/$1"
     }
   }
 }

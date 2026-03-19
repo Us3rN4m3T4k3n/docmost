@@ -118,6 +118,11 @@ export default function PageEditor({
   }, [remoteProvider?.status, isLocalSynced, isRemoteSynced]);
 
   useEffect(() => {
+    if (!editable) {
+      // READER users: skip WebSocket and local persistence entirely.
+      // The static EditorProvider render path (showStatic) handles display.
+      return;
+    }
     if (!providersRef.current) {
       const local = new IndexeddbPersistence(documentName, ydoc);
       local.on("synced", () => setLocalSynced(true));
@@ -165,7 +170,7 @@ export default function PageEditor({
       providersRef.current?.local.destroy();
       providersRef.current = null;
     };
-  }, [pageId]);
+  }, [pageId, editable]);
 
   /*
   useEffect(() => {

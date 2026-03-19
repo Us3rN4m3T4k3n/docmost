@@ -1,21 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { useUserRole } from '@/hooks/use-user-role';
 import api from '@/lib/api-client';
 import './ContentProtection.css';
 
-// Extend Window interface to include Firebug
-declare global {
-  interface Window {
-    Firebug?: {
-      chrome?: {
-        isInitialized?: boolean;
-      };
-    };
-  }
-}
-
 interface ContentProtectionProps {
   children: React.ReactNode;
+  protected: boolean;
 }
 
 // Dev tools detection and logging
@@ -33,72 +22,13 @@ const logProtectionAttempt = async (attemptType: string, details?: string) => {
   }
 };
 
-export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }) => {
-  const { isMember } = useUserRole();
-  const [devToolsOpen, setDevToolsOpen] = useState(false);
-  const [blurred, setBlurred] = useState(false);
-  const devToolsCheckInterval = useRef<NodeJS.Timeout | null>(null);
+export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, protected: isProtected }) => {
   const protectionRef = useRef<HTMLDivElement>(null);
 
-  // Only apply protection to members
-  if (!isMember) {
+  // Only apply protection when the space role requires it (READER users)
+  if (!isProtected) {
     return <>{children}</>;
   }
-
-  // Detect dev tools
-  const checkDevTools = useCallback(() => {
-    const widthThreshold = window.outerWidth - window.innerWidth > 160;
-    const heightThreshold = window.outerHeight - window.innerHeight > 160;
-    const orientation = widthThreshold ? 'vertical' : 'horizontal';
-
-    // Check for Firebug with safe property access
-    const firebugDetected = (window as any).Firebug?.chrome?.isInitialized || false;
-
-    if (
-      (widthThreshold && firebugDetected) ||
-      widthThreshold ||
-      heightThreshold
-    ) {
-      if (!devToolsOpen) {
-        setDevToolsOpen(true);
-        setBlurred(true);
-        logProtectionAttempt('dev_tools_opened', `Orientation: ${orientation}`);
-      }
-    } else {
-      if (devToolsOpen) {
-        setDevToolsOpen(false);
-        setBlurred(false);
-      }
-    }
-  }, [devToolsOpen]);
-
-  useEffect(() => {
-    // Start dev tools detection
-    devToolsCheckInterval.current = setInterval(checkDevTools, 1000);
-
-    // Additional dev tools detection methods
-    const detectDevToolsByDebugger = () => {
-      const start = new Date().getTime();
-      // @ts-ignore
-      debugger;
-      const end = new Date().getTime();
-      if (end - start > 100) {
-        setDevToolsOpen(true);
-        setBlurred(true);
-        logProtectionAttempt('dev_tools_debugger_detected');
-      }
-    };
-
-    // Check periodically
-    const debuggerInterval = setInterval(detectDevToolsByDebugger, 5000);
-
-    return () => {
-      if (devToolsCheckInterval.current) {
-        clearInterval(devToolsCheckInterval.current);
-      }
-      clearInterval(debuggerInterval);
-    };
-  }, [checkDevTools]);
 
   // Keyboard event handler
   const handleKeyDown = useCallback(
@@ -264,12 +194,12 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
     element.style.setProperty('-moz-user-select', 'none');
     element.style.setProperty('-ms-user-select', 'none');
     element.style.setProperty('user-select', 'none');
-    
+
     // Aggressive Safari Reader Mode prevention
     element.setAttribute('data-reader-mode', 'false');
     element.setAttribute('role', 'application');
     element.setAttribute('aria-hidden', 'false'); // Prevent Safari from thinking this is hidden content
-    
+
     // Remove and replace article tags that Safari looks for
     const articles = element.querySelectorAll('article');
     articles.forEach(article => {
@@ -287,7 +217,7 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
       div.setAttribute('data-no-reader', 'true');
       article.parentNode?.replaceChild(div, article);
     });
-    
+
     // Remove semantic HTML tags that Safari looks for
     const semanticTags = ['article', 'section', 'main', 'header', 'footer', 'aside', 'nav'];
     semanticTags.forEach(tag => {
@@ -304,7 +234,7 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
         if (mutation.type === 'attributes') {
           const target = mutation.target as HTMLElement;
           // Re-apply protection if attributes are changed
-          if (target.getAttribute('role') !== 'presentation' && 
+          if (target.getAttribute('role') !== 'presentation' &&
               semanticTags.includes(target.tagName.toLowerCase())) {
             target.setAttribute('role', 'presentation');
             target.setAttribute('data-no-reader', 'true');
@@ -312,25 +242,12 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
         }
       });
     });
-    
+
     readerModeObserver.observe(element, {
       attributes: true,
       subtree: true,
       attributeFilter: ['role', 'data-reader-mode'],
     });
-
-    // Detect console opening via console.log
-    const consoleProxy = new Proxy(console, {
-      get(target, prop) {
-        if (prop === 'log' || prop === 'dir' || prop === 'info') {
-          logProtectionAttempt('console_access', `Console.${String(prop)} accessed`);
-        }
-        return target[prop as keyof Console];
-      },
-    });
-
-    // Override console (optional - might be too aggressive)
-    // window.console = consoleProxy;
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown, true);
@@ -371,19 +288,7 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
 
   return (
     <div ref={protectionRef} className="content-protection">
-      {blurred && devToolsOpen && (
-        <div className="dev-tools-warning">
-          <div className="dev-tools-warning-content">
-            <h2>⚠️ Developer Tools Detected</h2>
-            <p>
-              Access to content is restricted when developer tools are open.
-              This action has been logged for security purposes.
-            </p>
-            <p>Please close developer tools to continue viewing content.</p>
-          </div>
-        </div>
-      )}
-      <div className={blurred ? 'content-blurred' : 'content-protected'}>
+      <div className="content-protected">
         {children}
       </div>
     </div>
@@ -391,4 +296,3 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children }
 };
 
 export default ContentProtection;
-
