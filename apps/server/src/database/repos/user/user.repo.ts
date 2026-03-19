@@ -150,7 +150,7 @@ export class UserRepo {
             WHEN users.role IN ('owner', 'admin') THEN NULL
             WHEN EXISTS (
               SELECT 1 FROM space_members
-              WHERE space_members."userId" = users.id
+              WHERE space_members."user_id" = users.id
               AND space_members.role IN ('writer', 'admin')
             ) THEN 'staff'
             ELSE 'client'
