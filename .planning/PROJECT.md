@@ -23,6 +23,13 @@ Paying clients can access the agency's SOPs in a protected, read-only environmen
 - ✓ Email notifications — existing
 - ✓ Full-text search — existing
 
+### Validated in Phase 2: Language and Content Localization (2026-03-19)
+
+- ✓ Spaces have a `language` locale code tag (varchar column, required at creation) — LANG-01
+- ✓ IP geolocation on first login silently sets `user.locale` via ip-api.com (BR→pt-BR, fallback en-US) — LANG-02
+- ✓ Account language preference settable from account settings (pre-existing account-language.tsx) — LANG-03
+- ✓ Space creation and edit forms require a Language selection (en-US / pt-BR) — LANG-05
+
 ### Active
 
 <!-- Goals for this work — building toward launch. -->
