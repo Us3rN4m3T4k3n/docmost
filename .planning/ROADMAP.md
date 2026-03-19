@@ -47,7 +47,7 @@ Plans:
   2. A client can change their language preference from account settings and the SOP list updates immediately to show only pages tagged for their selected language
   3. A PT-BR client cannot see EN-only SOPs; an EN client cannot see PT-BR-only SOPs
   4. Admin or Staff can tag any page or space as English, Brazilian Portuguese, or Both when publishing
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 02-01-PLAN.md — Add language column to spaces, wire server DTOs/service, add Language dropdown to space forms
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Client Isolation and Read-Only Access | 1/4 | In progress | - |
-| 2. Language and Content Localization | 0/2 | Not started | - |
+| 2. Language and Content Localization | 1/2 | In Progress|  |
 | 3. Content Protection | 0/? | Not started | - |
 | 4. Stripe Billing and Account Provisioning | 0/? | Not started | - |
 | 5. Railway Production Deployment | 0/? | Not started | - |

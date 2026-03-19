@@ -14,7 +14,7 @@
 ### Language & Content Localization
 
 - [ ] **LANG-01**: Content can be authored and stored in English (primary) and Brazilian Portuguese (secondary); other languages may be added later without auto-translation
-- [ ] **LANG-02**: External client's language is detected automatically via IP geolocation on first visit
+- [x] **LANG-02**: External client's language is detected automatically via IP geolocation on first visit
 - [ ] **LANG-03**: Client can manually select their language preference from their account settings, overriding IP detection
 - [ ] **LANG-04**: Clients see only SOPs tagged for their language — Brazilian Portuguese clients do not see EN-only SOPs and vice versa
 - [ ] **LANG-05**: Admin and Staff can tag each page/space as English, Brazilian Portuguese, or Both when publishing
@@ -113,7 +113,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ISOL-04 | Phase 1 | Pending |
 | ISOL-05 | Phase 1 | Pending |
 | LANG-01 | Phase 2 | Pending |
-| LANG-02 | Phase 2 | Pending |
+| LANG-02 | Phase 2 | Complete |
 | LANG-03 | Phase 2 | Pending |
 | LANG-04 | Phase 2 | Pending |
 | LANG-05 | Phase 2 | Pending |

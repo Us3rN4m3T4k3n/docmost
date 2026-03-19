@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 2 context gathered
-last_updated: "2026-03-19T22:04:55.497Z"
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-03-19T22:39:11.867Z"
 progress:
   total_phases: 5
   completed_phases: 0
-  total_plans: 4
-  completed_plans: 3
+  total_plans: 6
+  completed_plans: 4
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Paying clients can access the agency's SOPs in a protected, read-only environment they cannot easily copy or extract from.
-**Current focus:** Phase 01 — client-isolation-and-read-only-access
+**Current focus:** Phase 02 — language-and-content-localization (COMPLETE)
 
 ## Current Position
 
-Phase: 01 (client-isolation-and-read-only-access) — ✅ COMPLETE
-Next: Phase 02 (content-protection-hardening)
+Phase: 02 (language-and-content-localization) — COMPLETE
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Next: Phase 02 (content-protection-hardening)
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 02-language-and-content-localization P02 | 12 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,9 @@ Recent decisions affecting current work:
 - Client-side protection only: True DRM is impossible on web; goal is friction (watermark is enforcement)
 - Separate spaces for internal vs external: Docmost's space model maps cleanly to isolation requirement
 - Stripe for self-serve billing: Webhook-driven account provisioning; standard, well-supported
+- ip-api.com HTTP (not HTTPS): HTTPS requires paid API key; HTTP is free and sufficient for locale detection
+- Fire-and-forget geo-IP: .catch() swallows errors so login response is never blocked by geo-IP latency
+- COUNTRY_LOCALE_MAP as module-level constant: easy to extend; currently BR->pt-BR, all others->en-US
 
 ### Pending Todos
 
@@ -73,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-19T22:04:55.488Z
-Stopped at: Phase 2 context gathered
-Resume with: /gsd:plan-phase 2
+Last session: 2026-03-19T22:47:00Z
+Stopped at: Completed 02-02-PLAN.md
+Resume with: /gsd:execute-phase 3
