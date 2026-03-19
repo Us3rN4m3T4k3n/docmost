@@ -82,6 +82,12 @@ export default function WorkspaceMembersTable() {
                           {user.email}
                         </Text>
                       </div>
+                      {user.role === UserRole.MEMBER && user.userType === 'staff' && (
+                        <Badge color="green" variant="light" size="sm">Staff</Badge>
+                      )}
+                      {user.role === UserRole.MEMBER && user.userType === 'client' && (
+                        <Badge color="blue" variant="light" size="sm">Client</Badge>
+                      )}
                     </Group>
                   </Table.Td>
                   <Table.Td>
