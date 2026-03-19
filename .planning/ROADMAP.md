@@ -36,7 +36,7 @@ Plans:
 - [ ] 01-00-PLAN.md — Wave 0: Test scaffolds for space-ability factory and page controller
 - [ ] 01-01-PLAN.md — Close cross-workspace data boundary gap (workspaceId filter in PageRepo.findById)
 - [ ] 01-02-PLAN.md — Fix client-side READER isolation (ContentProtection, Hocuspocus, sidebar)
-- [ ] 01-03-PLAN.md — Staff/Client badge, role hierarchy visibility, and client space PRIVATE enforcement
+- [x] 01-03-PLAN.md — Staff/Client badge, role hierarchy visibility, and client space PRIVATE enforcement
 
 ### Phase 2: Language and Content Localization
 **Goal**: Clients see only the SOPs tagged for their language, with language auto-detected on first visit and overridable from account settings
@@ -92,7 +92,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Client Isolation and Read-Only Access | 0/4 | Planning complete | - |
+| 1. Client Isolation and Read-Only Access | 1/4 | In progress | - |
 | 2. Language and Content Localization | 0/? | Not started | - |
 | 3. Content Protection | 0/? | Not started | - |
 | 4. Stripe Billing and Account Provisioning | 0/? | Not started | - |
