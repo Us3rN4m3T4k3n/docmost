@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-19T22:39:11.867Z"
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-19T22:40:40.688Z"
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -47,6 +47,7 @@ Plan: 2 of 2
 
 *Updated after each plan completion*
 | Phase 02-language-and-content-localization P02 | 12 | 2 tasks | 5 files |
+| Phase 02-language-and-content-localization P01 | 4 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,8 @@ Recent decisions affecting current work:
 - ip-api.com HTTP (not HTTPS): HTTPS requires paid API key; HTTP is free and sufficient for locale detection
 - Fire-and-forget geo-IP: .catch() swallows errors so login response is never blocked by geo-IP latency
 - COUNTRY_LOCALE_MAP as module-level constant: easy to extend; currently BR->pt-BR, all others->en-US
+- [Phase 02]: Static language list (en-US, pt-BR) for Phase 2 with TODO for dynamic API fetch in future
+- [Phase 02]: Nullable language column with en-US code default: existing spaces get null in DB, service treats null as en-US
 
 ### Pending Todos
 
@@ -77,6 +80,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-19T22:47:00Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-19T22:40:40.686Z
+Stopped at: Completed 02-01-PLAN.md
 Resume with: /gsd:execute-phase 3

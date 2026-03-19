@@ -13,7 +13,7 @@ This roadmap transforms a Docmost fork into a commercial SOP access platform for
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Client Isolation and Read-Only Access** - Enforce server-side READER isolation, strip editor chrome, close workspace-boundary data leak
-- [ ] **Phase 2: Language and Content Localization** - Language tagging, IP-based detection, client language preference, and filtered SOP visibility
+- [x] **Phase 2: Language and Content Localization** - Language tagging, IP-based detection, client language preference, and filtered SOP visibility (completed 2026-03-19)
 - [ ] **Phase 3: Content Protection** - Verified right-click, copy, print blocks and dynamic watermark wired to correct space role
 - [ ] **Phase 4: Stripe Billing and Account Provisioning** - Self-serve checkout, automatic account creation, subscription lifecycle, and admin controls
 - [ ] **Phase 5: Railway Production Deployment** - Two-service Railway deployment with S3 storage, health check, SPA routing, and Stripe webhook wired to production URL
@@ -47,7 +47,7 @@ Plans:
   2. A client can change their language preference from account settings and the SOP list updates immediately to show only pages tagged for their selected language
   3. A PT-BR client cannot see EN-only SOPs; an EN client cannot see PT-BR-only SOPs
   4. Admin or Staff can tag any page or space as English, Brazilian Portuguese, or Both when publishing
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 02-01-PLAN.md — Add language column to spaces, wire server DTOs/service, add Language dropdown to space forms
@@ -97,7 +97,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Client Isolation and Read-Only Access | 1/4 | In progress | - |
-| 2. Language and Content Localization | 1/2 | In Progress|  |
+| 2. Language and Content Localization | 2/2 | Complete   | 2026-03-19 |
 | 3. Content Protection | 0/? | Not started | - |
 | 4. Stripe Billing and Account Provisioning | 0/? | Not started | - |
 | 5. Railway Production Deployment | 0/? | Not started | - |
