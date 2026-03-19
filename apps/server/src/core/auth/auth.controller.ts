@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
   UseGuards,
   Logger,
@@ -21,7 +22,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { PasswordResetDto } from './dto/password-reset.dto';
 import { VerifyUserTokenDto } from './dto/verify-user-token.dto';
-import { FastifyReply } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { validateSsoEnforcement } from './auth.util';
 import { ModuleRef } from '@nestjs/core';
 
@@ -41,8 +42,13 @@ export class AuthController {
     @AuthWorkspace() workspace: Workspace,
     @Res({ passthrough: true }) res: FastifyReply,
     @Body() loginInput: LoginDto,
+    @Req() req: FastifyRequest,
   ) {
     validateSsoEnforcement(workspace);
+
+    const clientIp =
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ??
+      req.ip;
 
     let MfaModule: any;
     let isMfaModuleReady = false;
@@ -83,7 +89,11 @@ export class AuthController {
       }
     }
 
-    const authToken = await this.authService.login(loginInput, workspace.id);
+    const authToken = await this.authService.login(
+      loginInput,
+      workspace.id,
+      clientIp,
+    );
     this.setAuthCookie(res, authToken);
   }
 

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -29,9 +30,12 @@ import { InjectKysely } from 'nestjs-kysely';
 import { executeTx } from '@docmost/db/utils';
 import { VerifyUserTokenDto } from '../dto/verify-user-token.dto';
 import { DomainService } from '../../../integrations/environment/domain.service';
+import { LocaleDetectionService } from '../../../integrations/locale/locale-detection.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private signupService: SignupService,
     private tokenService: TokenService,
@@ -39,10 +43,11 @@ export class AuthService {
     private userTokenRepo: UserTokenRepo,
     private mailService: MailService,
     private domainService: DomainService,
+    private localeDetectionService: LocaleDetectionService,
     @InjectKysely() private readonly db: KyselyDB,
   ) {}
 
-  async login(loginDto: LoginDto, workspaceId: string) {
+  async login(loginDto: LoginDto, workspaceId: string, clientIp?: string) {
     const user = await this.userRepo.findByEmail(loginDto.email, workspaceId, {
       includePassword: true,
     });
@@ -63,6 +68,13 @@ export class AuthService {
 
     user.lastLoginAt = new Date();
     await this.userRepo.updateLastLogin(user.id, workspaceId);
+
+    // Geo-IP: detect locale on first login (when locale is null)
+    if (!user.locale && clientIp) {
+      this.localeDetectionService
+        .detectAndSetLocale(user.id, workspaceId, clientIp)
+        .catch((err) => this.logger.warn('locale detection failed:', err));
+    }
 
     return this.tokenService.generateAccessToken(user);
   }
