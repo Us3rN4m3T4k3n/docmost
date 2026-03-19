@@ -1,4 +1,12 @@
-import { Group, Box, Button, TextInput, Stack, Textarea } from "@mantine/core";
+import {
+  Group,
+  Box,
+  Button,
+  TextInput,
+  Stack,
+  Textarea,
+  Select,
+} from "@mantine/core";
 import React from "react";
 import { useForm, zodResolver } from "@mantine/form";
 import * as z from "zod";
@@ -17,6 +25,7 @@ const formSchema = z.object({
       /^[a-zA-Z0-9]+$/,
       "Space slug must be alphanumeric. No special characters",
     ),
+  language: z.string().min(2).optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -34,6 +43,7 @@ export function EditSpaceForm({ space, readOnly }: EditSpaceFormProps) {
       name: space?.name,
       description: space?.description || "",
       slug: space.slug,
+      language: space?.language || "en-US",
     },
   });
 
@@ -41,6 +51,7 @@ export function EditSpaceForm({ space, readOnly }: EditSpaceFormProps) {
     name?: string;
     description?: string;
     slug?: string;
+    language?: string;
   }) => {
     const spaceData: Partial<ISpace> = {
       spaceId: space.id,
@@ -54,6 +65,10 @@ export function EditSpaceForm({ space, readOnly }: EditSpaceFormProps) {
 
     if (form.isDirty("slug")) {
       spaceData.slug = values.slug;
+    }
+
+    if (form.isDirty("language")) {
+      spaceData.language = values.language;
     }
 
     await updateSpaceMutation.mutateAsync(spaceData);
@@ -92,6 +107,21 @@ export function EditSpaceForm({ space, readOnly }: EditSpaceFormProps) {
               minRows={1}
               maxRows={3}
               {...form.getInputProps("description")}
+            />
+
+            {/* TODO: fetch dynamically from API as new language spaces are added */}
+            <Select
+              id="language"
+              label={t("Language")}
+              placeholder={t("Select language")}
+              variant="filled"
+              disabled={readOnly}
+              data={[
+                { value: "en-US", label: "English (US)" },
+                { value: "pt-BR", label: "Portugues (Brasil)" },
+              ]}
+              allowDeselect={false}
+              {...form.getInputProps("language")}
             />
           </Stack>
 

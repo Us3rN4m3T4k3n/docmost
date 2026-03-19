@@ -18,6 +18,7 @@ export interface ISpace {
   memberCount?: number;
   spaceId?: string;
   membership?: IMembership;
+  language?: string;
 }
 
 interface IMembership {
