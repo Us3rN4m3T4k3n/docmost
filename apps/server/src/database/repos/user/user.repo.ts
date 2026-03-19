@@ -144,6 +144,19 @@ export class UserRepo {
     let query = this.db
       .selectFrom('users')
       .select(this.baseFields)
+      .select(
+        sql<string | null>`
+          CASE
+            WHEN users.role IN ('owner', 'admin') THEN NULL
+            WHEN EXISTS (
+              SELECT 1 FROM space_members
+              WHERE space_members."userId" = users.id
+              AND space_members.role IN ('writer', 'admin')
+            ) THEN 'staff'
+            ELSE 'client'
+          END
+        `.as('userType'),
+      )
       .where('workspaceId', '=', workspaceId)
       .where('deletedAt', 'is', null)
       .orderBy('createdAt', 'asc');
