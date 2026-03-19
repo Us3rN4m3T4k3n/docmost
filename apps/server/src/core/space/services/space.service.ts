@@ -83,6 +83,7 @@ export class SpaceService {
         creatorId: userId,
         workspaceId: workspaceId,
         slug: createSpaceDto.slug,
+        language: createSpaceDto.language ?? 'en-US',
       },
       trx,
     );
@@ -110,6 +111,7 @@ export class SpaceService {
         name: updateSpaceDto.name,
         description: updateSpaceDto.description,
         slug: updateSpaceDto.slug,
+        language: updateSpaceDto.language,
       },
       updateSpaceDto.spaceId,
       workspaceId,

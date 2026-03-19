@@ -271,6 +271,7 @@ export interface Spaces {
   deletedAt: Timestamp | null;
   description: string | null;
   id: Generated<string>;
+  language: string | null;
   logo: string | null;
   name: string | null;
   slug: string;

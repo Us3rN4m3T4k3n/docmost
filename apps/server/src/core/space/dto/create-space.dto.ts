@@ -1,5 +1,6 @@
 import {
   IsAlphanumeric,
+  IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
@@ -22,4 +23,8 @@ export class CreateSpaceDto {
   @MaxLength(50)
   @IsAlphanumeric()
   slug: string;
+
+  @IsNotEmpty()
+  @IsString()
+  language: string;
 }
