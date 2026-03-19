@@ -47,6 +47,7 @@ export class PageRepo {
   async findById(
     pageId: string,
     opts?: {
+      workspaceId?: string;
       includeContent?: boolean;
       includeTextContent?: boolean;
       includeYdoc?: boolean;
@@ -95,6 +96,10 @@ export class PageRepo {
       query = query.where('id', '=', pageId);
     } else {
       query = query.where('slugId', '=', pageId);
+    }
+
+    if (opts?.workspaceId) {
+      query = query.where('workspaceId', '=', opts.workspaceId);
     }
 
     return query.executeTakeFirst();

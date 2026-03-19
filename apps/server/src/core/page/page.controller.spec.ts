@@ -78,21 +78,17 @@ describe('PageController', () => {
   });
 
   describe('getPage', () => {
-    // TODO: uncomment after Plan 01-01 adds @AuthWorkspace to getPage
-    // and adds workspaceId filter to PageRepo.findById
-    it.skip('should return NotFoundException when pageId belongs to a different workspace', async () => {
-      // Setup: findById returns null when workspaceId filter is applied
+    it('should return NotFoundException when pageId belongs to a different workspace', async () => {
+      // Setup: findById returns null when workspaceId filter is applied (page not in this workspace)
       mockPageRepo.findById.mockResolvedValueOnce(null);
 
-      // Act & Assert: calling getPage with a valid pageId but wrong workspace
-      // should throw NotFoundException (or equivalent).
-      // Plan 01-01 will add the workspace parameter and workspaceId filtering.
-      const getPageAny = controller.getPage as (...args: any[]) => any;
+      // Act & Assert: getPage passes workspace.id to findById; when the page UUID
+      // belongs to a different workspace, the scoped query returns null → NotFoundException.
       await expect(
-        getPageAny(
+        controller.getPage(
           { pageId: 'valid-uuid-from-other-workspace', includeSpace: true, includeContent: true },
           mockUser,
-          mockWorkspace, // workspace B — different from the page's workspace
+          mockWorkspace, // workspace A — page belongs to workspace B, so findById returns null
         ),
       ).rejects.toThrow(NotFoundException);
     });
@@ -104,6 +100,7 @@ describe('PageController', () => {
         controller.getPage(
           { pageId: 'nonexistent-page-id', includeSpace: true, includeContent: true },
           mockUser,
+          mockWorkspace,
         ),
       ).rejects.toThrow(NotFoundException);
     });

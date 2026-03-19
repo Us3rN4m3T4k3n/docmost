@@ -48,8 +48,9 @@ export class PageController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/info')
-  async getPage(@Body() dto: PageInfoDto, @AuthUser() user: User) {
+  async getPage(@Body() dto: PageInfoDto, @AuthUser() user: User, @AuthWorkspace() workspace: Workspace) {
     const page = await this.pageRepo.findById(dto.pageId, {
+      workspaceId: workspace.id,
       includeSpace: true,
       includeContent: true,
       includeCreator: true,
