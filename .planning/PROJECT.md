@@ -30,17 +30,30 @@ Paying clients can access the agency's SOPs in a protected, read-only environmen
 - ✓ Account language preference settable from account settings (pre-existing account-language.tsx) — LANG-03
 - ✓ Space creation and edit forms require a Language selection (en-US / pt-BR) — LANG-05
 
+### Validated in Phase 3: Content Protection (2026-03-20)
+
+- ✓ Right-click context menu disabled for READER-role users (ContentProtection.tsx) — PROT-01
+- ✓ Text selection and copy-paste disabled for READER-role users — PROT-02
+- ✓ Print / Ctrl+P blocked for READER-role users — PROT-03
+- ✓ Dynamic diagonal watermark with user's email via SVG data URI + mix-blend-mode — PROT-04
+- ✓ Content protection scoped to READER space role (not workspace member) — PROT-05
+- ✓ Dev tools false-positive detection removed from ContentProtectionAlways.tsx — PROT-06
+- ✓ Screenshot attempts persisted to DB (`screenshot_attempts` table, Kysely-backed service) — PROT-V2-01
+- ✓ Admin Security panel at `/settings/content-security` with violation log + reinstatement — PROT-V2-02
+- ✓ `suspendedAt` enforced in JWT strategy and TokenService — account locked on 3rd strike
+- ✓ 3-strike system: warning → final warning → account locked, admin reinstates manually
+
 ### Active
 
 <!-- Goals for this work — building toward launch. -->
 
 - [ ] External client space is fully isolated from internal spaces (clients cannot see internal docs, company policies, or employee-facing content)
 - [ ] External clients get read-only access only — no editor UI, no ability to create/edit pages
-- [ ] Content protection: right-click and context menu disabled for external clients
-- [ ] Content protection: text selection and copy-paste disabled for external clients
-- [ ] Content protection: print / Ctrl+P blocked for external clients
-- [ ] Content protection: dynamic watermark showing client's email/name on all pages
-- [ ] Content protection features are verified working (tested and confirmed)
+- [x] Content protection: right-click and context menu disabled for external clients ✓ Phase 3
+- [x] Content protection: text selection and copy-paste disabled for external clients ✓ Phase 3
+- [x] Content protection: print / Ctrl+P blocked for external clients ✓ Phase 3
+- [x] Content protection: dynamic watermark showing client's email/name on all pages ✓ Phase 3
+- [x] Content protection features are verified working (tested and confirmed) ✓ Phase 3
 - [ ] Stripe-powered self-serve access: external clients can purchase a subscription and get account created automatically
 - [ ] Admin can manage external subscriptions (view, cancel, refund)
 - [ ] Railway deployment is live and accessible
