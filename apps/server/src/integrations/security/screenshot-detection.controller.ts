@@ -6,11 +6,14 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Req,
+  Param,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ScreenshotDetectionService } from './screenshot-detection.service';
 import { ScreenshotAttemptDto } from './dto/screenshot-attempt.dto';
+import { AuthUser } from '@/common/decorators/auth-user.decorator';
+import { User } from '@docmost/db/types/entity.types';
 
 @UseGuards(JwtAuthGuard)
 @Controller('security')
@@ -21,24 +24,21 @@ export class ScreenshotDetectionController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('screenshot-attempt')
-  async logScreenshotAttempt(@Body() dto: ScreenshotAttemptDto, @Req() req) {
-    const userId = req.user?.userId;
-    const workspaceId = req.raw?.workspaceId;
-    const ipAddress = req.ip || req.raw?.ip;
-
+  async logScreenshotAttempt(
+    @Body() dto: ScreenshotAttemptDto,
+    @AuthUser() user: User,
+  ) {
     return this.screenshotDetectionService.logScreenshotAttempt({
       ...dto,
-      userId,
-      workspaceId,
-      ipAddress,
+      userId: user.id,
+      workspaceId: user.workspaceId,
     });
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('screenshot-status')
-  async getScreenshotStatus(@Req() req) {
-    const userId = req.user?.userId;
-    const status = await this.screenshotDetectionService.getUserStatus(userId);
+  async getScreenshotStatus(@AuthUser() user: User) {
+    const status = await this.screenshotDetectionService.getUserStatus(user.id);
 
     return {
       success: true,
@@ -49,5 +49,26 @@ export class ScreenshotDetectionController {
       },
     };
   }
-}
 
+  @Get('violations')
+  @UseGuards(JwtAuthGuard)
+  async getViolations(@AuthUser() user: User) {
+    if (user.role !== 'admin' && user.role !== 'owner') {
+      throw new ForbiddenException();
+    }
+    return this.screenshotDetectionService.getUsersWithViolations();
+  }
+
+  @Post('reinstate/:userId')
+  @UseGuards(JwtAuthGuard)
+  async reinstateUser(
+    @AuthUser() user: User,
+    @Param('userId') userId: string,
+  ) {
+    if (user.role !== 'admin' && user.role !== 'owner') {
+      throw new ForbiddenException();
+    }
+    await this.screenshotDetectionService.resetUserAttempts(userId);
+    return { success: true };
+  }
+}

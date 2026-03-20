@@ -31,6 +31,8 @@ export class UserRepo {
     'settings',
     'lastLoginAt',
     'deactivatedAt',
+    'suspendedAt',
+    'suspensionReason',
     'createdAt',
     'updatedAt',
     'deletedAt',

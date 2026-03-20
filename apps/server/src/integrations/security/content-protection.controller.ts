@@ -5,11 +5,12 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  Req,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ContentProtectionService } from './content-protection.service';
 import { ContentProtectionAttemptDto } from './dto/content-protection-attempt.dto';
+import { AuthUser } from '@/common/decorators/auth-user.decorator';
+import { User } from '@docmost/db/types/entity.types';
 
 @UseGuards(JwtAuthGuard)
 @Controller('security')
@@ -22,18 +23,12 @@ export class ContentProtectionController {
   @Post('protection-attempt')
   async logProtectionAttempt(
     @Body() dto: ContentProtectionAttemptDto,
-    @Req() req,
+    @AuthUser() user: User,
   ) {
-    const userId = req.user?.userId;
-    const workspaceId = req.raw?.workspaceId;
-    const ipAddress = req.ip || req.raw?.ip;
-
     return this.contentProtectionService.logAttempt({
       ...dto,
-      userId,
-      workspaceId,
-      ipAddress,
+      userId: user.id,
+      workspaceId: user.workspaceId,
     });
   }
 }
-
