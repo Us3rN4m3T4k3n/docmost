@@ -2,31 +2,21 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectKysely } from 'nestjs-kysely';
 import { KyselyDB } from '@docmost/db/types/kysely.types';
 import { UserRepo } from '@docmost/db/repos/user/user.repo';
+import { sql } from 'kysely';
 
 export interface ScreenshotAttemptLog {
   method: string;
   details?: string;
-  timestamp: string;
-  userAgent: string;
+  timestamp?: string;
+  userAgent?: string;
   userId?: string;
   workspaceId?: string;
   ipAddress?: string;
 }
 
-export interface UserScreenshotStatus {
-  userId: string;
-  attemptCount: number;
-  lastAttempt: Date;
-  status: 'good_standing' | 'warning' | 'final_warning' | 'suspended' | 'banned';
-  isSuspended: boolean;
-}
-
 @Injectable()
 export class ScreenshotDetectionService {
   private readonly logger = new Logger(ScreenshotDetectionService.name);
-  
-  // In-memory storage for now (replace with database in production)
-  private userAttempts = new Map<string, UserScreenshotStatus>();
 
   constructor(
     @InjectKysely() private readonly db: KyselyDB,
@@ -34,7 +24,8 @@ export class ScreenshotDetectionService {
   ) {}
 
   /**
-   * Log screenshot attempt and return updated status
+   * Log screenshot attempt and return updated status.
+   * Persists to screenshot_attempts table and suspends user on 3rd attempt.
    */
   async logScreenshotAttempt(attempt: ScreenshotAttemptLog): Promise<{
     success: boolean;
@@ -45,101 +36,158 @@ export class ScreenshotDetectionService {
   }> {
     const userId = attempt.userId;
 
-    // Log the attempt
     this.logger.warn(
       `Screenshot Attempt - User: ${userId}, ` +
         `Method: ${attempt.method}, ` +
         `Details: ${attempt.details || 'N/A'}, ` +
         `IP: ${attempt.ipAddress}, ` +
-        `Time: ${attempt.timestamp}`,
+        `Time: ${attempt.timestamp || new Date().toISOString()}`,
     );
 
-    // Get or create user status
-    let userStatus = this.userAttempts.get(userId);
-    if (!userStatus) {
-      userStatus = {
+    // Query current attempt count
+    const countResult = await this.db
+      .selectFrom('screenshotAttempts')
+      .select(sql<string>`count(*)`.as('count'))
+      .where('userId', '=', userId)
+      .executeTakeFirst();
+
+    const currentCount = parseInt((countResult?.count as string) || '0', 10);
+    const newAttemptNumber = currentCount + 1;
+
+    // Insert new attempt row
+    await this.db
+      .insertInto('screenshotAttempts')
+      .values({
         userId,
-        attemptCount: 0,
-        lastAttempt: new Date(),
-        status: 'good_standing',
-        isSuspended: false,
-      };
+        workspaceId: attempt.workspaceId || '',
+        method: attempt.method,
+        userAgent: attempt.userAgent || null,
+        ipAddress: attempt.ipAddress || null,
+        attemptNumber: newAttemptNumber,
+      })
+      .execute();
+
+    // Determine status
+    let status: string;
+    let isSuspended = false;
+
+    if (newAttemptNumber === 1) {
+      status = 'warning';
+    } else if (newAttemptNumber === 2) {
+      status = 'final_warning';
+    } else {
+      status = 'suspended';
+      isSuspended = true;
+      await this.suspendUserAccount(userId);
     }
-
-    // Increment attempt count
-    userStatus.attemptCount++;
-    userStatus.lastAttempt = new Date();
-
-    // Update status based on attempt count
-    if (userStatus.attemptCount === 1) {
-      userStatus.status = 'warning';
-    } else if (userStatus.attemptCount === 2) {
-      userStatus.status = 'final_warning';
-      // Notify admins of second violation
-      await this.notifyAdminsOfViolation(userId, userStatus.attemptCount, attempt);
-    } else if (userStatus.attemptCount >= 3) {
-      userStatus.status = 'suspended';
-      userStatus.isSuspended = true;
-      // Suspend user account
-      await this.suspendUserAccount(userId, attempt);
-      // Notify admins immediately
-      await this.notifyAdminsOfSuspension(userId, userStatus.attemptCount, attempt);
-    }
-
-    // Store updated status
-    this.userAttempts.set(userId, userStatus);
-
-    // TODO: Persist to database
-    /*
-    await this.db.screenshotAttempts.insert({
-      userId,
-      workspaceId: attempt.workspaceId,
-      method: attempt.method,
-      details: attempt.details,
-      userAgent: attempt.userAgent,
-      ipAddress: attempt.ipAddress,
-      timestamp: new Date(attempt.timestamp),
-      attemptNumber: userStatus.attemptCount,
-      status: userStatus.status,
-    });
-
-    await this.db.users.update(userId, {
-      screenshotAttempts: userStatus.attemptCount,
-      accountStatus: userStatus.status,
-      isSuspended: userStatus.isSuspended,
-    });
-    */
 
     return {
       success: true,
-      attemptCount: userStatus.attemptCount,
-      status: userStatus.status,
-      isSuspended: userStatus.isSuspended,
-      message: this.getMessageForStatus(userStatus),
+      attemptCount: newAttemptNumber,
+      status,
+      isSuspended,
+      message: this.getMessageForStatus(status),
     };
   }
 
   /**
-   * Get user's current screenshot attempt status
+   * Get user's current screenshot attempt status from database.
    */
-  async getUserStatus(userId: string): Promise<UserScreenshotStatus | null> {
-    const status = this.userAttempts.get(userId);
-    
-    // TODO: Fetch from database in production
-    /*
-    const dbStatus = await this.db.users.findOne(userId);
-    if (dbStatus) {
-      return {
-        userId,
-        attemptCount: dbStatus.screenshotAttempts || 0,
-        lastAttempt: dbStatus.lastScreenshotAttempt,
-        status: dbStatus.accountStatus,
-        isSuspended: dbStatus.isSuspended,
-      };
-    }
-    */
-    
-    return status || null;
+  async getUserStatus(
+    userId: string,
+  ): Promise<{ attemptCount: number; suspended: boolean } | null> {
+    const countResult = await this.db
+      .selectFrom('screenshotAttempts')
+      .select(sql<string>`count(*)`.as('count'))
+      .where('userId', '=', userId)
+      .executeTakeFirst();
+
+    const attemptCount = parseInt((countResult?.count as string) || '0', 10);
+
+    // Query the user's suspension status directly
+    const userRow = await this.db
+      .selectFrom('users')
+      .select(['suspendedAt'])
+      .where('id', '=', userId)
+      .executeTakeFirst();
+
+    const suspended = userRow?.suspendedAt != null;
+
+    return { attemptCount, suspended };
+  }
+
+  /**
+   * Suspend user account by setting suspendedAt.
+   */
+  async suspendUserAccount(userId: string): Promise<void> {
+    this.logger.error(
+      `Suspending user account: ${userId} - Third screenshot violation detected`,
+    );
+
+    await this.db
+      .updateTable('users')
+      .set({
+        suspendedAt: new Date(),
+        suspensionReason: 'screenshot_violation',
+        updatedAt: new Date(),
+      })
+      .where('id', '=', userId)
+      .execute();
+
+    this.logger.log(`User ${userId} successfully suspended in database`);
+  }
+
+  /**
+   * Reset user's screenshot attempts and clear suspension (admin action).
+   */
+  async resetUserAttempts(userId: string): Promise<void> {
+    this.logger.log(`Resetting screenshot attempts for user ${userId}`);
+
+    await this.db
+      .deleteFrom('screenshotAttempts')
+      .where('userId', '=', userId)
+      .execute();
+
+    await this.db
+      .updateTable('users')
+      .set({ suspendedAt: null, suspensionReason: null, updatedAt: new Date() })
+      .where('id', '=', userId)
+      .execute();
+  }
+
+  /**
+   * Get all users with screenshot violations (for admin dashboard).
+   */
+  async getUsersWithViolations(): Promise<
+    Array<{
+      userId: string;
+      email: string;
+      attemptCount: number;
+      lastAttempt: Date | null;
+      suspendedAt: Date | null;
+    }>
+  > {
+    const rows = await this.db
+      .selectFrom('screenshotAttempts')
+      .innerJoin('users', 'users.id', 'screenshotAttempts.userId')
+      .select([
+        'screenshotAttempts.userId',
+        'users.email',
+        sql<string>`count(screenshot_attempts.id)`.as('attemptCount'),
+        sql<Date>`max(screenshot_attempts.created_at)`.as('lastAttempt'),
+        'users.suspendedAt',
+      ])
+      .groupBy(['screenshotAttempts.userId', 'users.email', 'users.suspendedAt'])
+      .orderBy(sql`count(screenshot_attempts.id)`, 'desc')
+      .execute();
+
+    return rows.map((row) => ({
+      userId: row.userId,
+      email: row.email,
+      attemptCount: parseInt(row.attemptCount as unknown as string, 10),
+      lastAttempt: row.lastAttempt || null,
+      suspendedAt: row.suspendedAt || null,
+    }));
   }
 
   /**
@@ -147,211 +195,22 @@ export class ScreenshotDetectionService {
    */
   async isUserSuspended(userId: string): Promise<boolean> {
     const status = await this.getUserStatus(userId);
-    return status?.isSuspended || false;
+    return status?.suspended || false;
   }
 
   /**
-   * Suspend user account
+   * Get appropriate message for status string
    */
-  private async suspendUserAccount(userId: string, attempt: ScreenshotAttemptLog) {
-    this.logger.error(
-      `🚫 SUSPENDING USER ACCOUNT: ${userId} - ` +
-      `Third screenshot violation detected`,
-    );
-
-    try {
-      // Suspend user in database
-      await this.db
-        .updateTable('users')
-        .set({
-          suspendedAt: new Date(),
-          suspensionReason: 'Repeated screenshot violations - Automated suspension after 3 attempts',
-          updatedAt: new Date(),
-        })
-        .where('id', '=', userId)
-        .execute();
-
-      this.logger.log(`✅ User ${userId} successfully suspended in database`);
-
-      // TODO: Implement additional actions
-      // - Revoke all active sessions
-      // - Send suspension email
-      // - Notify admins
-    } catch (error) {
-      this.logger.error(`Failed to suspend user ${userId} in database:`, error);
-      throw error;
-    }
-  }
-
-  /**
-   * Notify workspace admins of violation
-   */
-  private async notifyAdminsOfViolation(
-    userId: string,
-    attemptCount: number,
-    attempt: ScreenshotAttemptLog,
-  ) {
-    this.logger.warn(
-      `📧 Notifying admins: User ${userId} has ${attemptCount} screenshot violations`,
-    );
-
-    // TODO: Implement admin notification
-    /*
-    const admins = await this.db.users.find({
-      workspaceId: attempt.workspaceId,
-      role: { $in: ['owner', 'admin'] },
-    });
-
-    for (const admin of admins) {
-      await this.mailService.sendEmail({
-        to: admin.email,
-        subject: `Security Alert: Screenshot Violation - User ${userId}`,
-        template: 'admin-violation-alert',
-        data: {
-          userId,
-          attemptCount,
-          method: attempt.method,
-          timestamp: attempt.timestamp,
-          ipAddress: attempt.ipAddress,
-          userAgent: attempt.userAgent,
-          severity: attemptCount === 2 ? 'final_warning' : 'warning',
-        },
-      });
-    }
-
-    // Create admin notification in app
-    await this.notificationService.create({
-      workspaceId: attempt.workspaceId,
-      type: 'security_alert',
-      severity: 'high',
-      title: 'Screenshot Violation Detected',
-      message: `User ${userId} has ${attemptCount} screenshot violations`,
-      actionUrl: `/settings/members/${userId}`,
-      metadata: attempt,
-    });
-    */
-  }
-
-  /**
-   * Notify admins of account suspension
-   */
-  private async notifyAdminsOfSuspension(
-    userId: string,
-    attemptCount: number,
-    attempt: ScreenshotAttemptLog,
-  ) {
-    this.logger.error(
-      `🚨 URGENT: Notifying admins of account suspension - User ${userId}`,
-    );
-
-    // TODO: Implement urgent admin notification
-    /*
-    const admins = await this.db.users.find({
-      workspaceId: attempt.workspaceId,
-      role: { $in: ['owner', 'admin'] },
-    });
-
-    for (const admin of admins) {
-      // Send email with high priority
-      await this.mailService.sendEmail({
-        to: admin.email,
-        subject: `🚫 URGENT: Account Suspended - Copyright Violation`,
-        priority: 'high',
-        template: 'admin-suspension-alert',
-        data: {
-          userId,
-          attemptCount,
-          method: attempt.method,
-          timestamp: attempt.timestamp,
-          ipAddress: attempt.ipAddress,
-          suspensionReason: 'Repeated screenshot violations (3+ attempts)',
-          actionRequired: true,
-        },
-      });
-
-      // Create urgent in-app notification
-      await this.notificationService.create({
-        workspaceId: attempt.workspaceId,
-        type: 'security_alert',
-        severity: 'critical',
-        title: '🚫 Account Suspended - Copyright Violation',
-        message: `User ${userId} has been automatically suspended after ${attemptCount} screenshot violations`,
-        actionUrl: `/settings/members/${userId}`,
-        requiresAction: true,
-        metadata: attempt,
-      });
-    }
-
-    // Log to security audit log
-    await this.auditService.log({
-      type: 'account_suspension',
-      userId,
-      workspaceId: attempt.workspaceId,
-      reason: 'automated_screenshot_violations',
-      attemptCount,
-      metadata: attempt,
-    });
-    */
-  }
-
-  /**
-   * Get appropriate message for user status
-   */
-  private getMessageForStatus(status: UserScreenshotStatus): string {
-    switch (status.status) {
+  private getMessageForStatus(status: string): string {
+    switch (status) {
       case 'warning':
         return 'First warning: Screenshot attempt detected and logged.';
       case 'final_warning':
         return 'Final warning: This is your second violation. One more will result in suspension.';
       case 'suspended':
         return 'Account suspended: Your account has been suspended due to repeated violations.';
-      case 'banned':
-        return 'Account banned: Your account has been permanently banned.';
       default:
         return 'Account in good standing.';
     }
   }
-
-  /**
-   * Reset user's screenshot attempt count (admin action)
-   */
-  async resetUserAttempts(userId: string, adminId: string) {
-    this.logger.log(`Admin ${adminId} reset screenshot attempts for user ${userId}`);
-    
-    this.userAttempts.delete(userId);
-
-    // TODO: Update database
-    /*
-    await this.db.users.update(userId, {
-      screenshotAttempts: 0,
-      accountStatus: 'good_standing',
-      isSuspended: false,
-      lastResetBy: adminId,
-      lastResetAt: new Date(),
-    });
-    */
-
-    return { success: true, message: 'User attempts reset successfully' };
-  }
-
-  /**
-   * Get all users with violations (for admin dashboard)
-   */
-  async getUsersWithViolations(workspaceId: string) {
-    // TODO: Query database
-    /*
-    return await this.db.users.find({
-      workspaceId,
-      screenshotAttempts: { $gt: 0 },
-    }).sort({ screenshotAttempts: -1 });
-    */
-
-    // For now, return in-memory data
-    const violations = [];
-    for (const [userId, status] of this.userAttempts.entries()) {
-      violations.push(status);
-    }
-    return violations;
-  }
 }
-

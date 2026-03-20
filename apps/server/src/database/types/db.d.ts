@@ -363,6 +363,17 @@ export interface Workspaces {
   updatedAt: Generated<Timestamp>;
 }
 
+export interface ScreenshotAttempts {
+  id: Generated<string>;
+  userId: string;
+  workspaceId: string;
+  method: string;
+  userAgent: string | null;
+  ipAddress: string | null;
+  attemptNumber: number;
+  createdAt: Generated<Timestamp>;
+}
+
 export interface DB {
   apiKeys: ApiKeys;
   attachments: Attachments;
@@ -376,6 +387,7 @@ export interface DB {
   groupUsers: GroupUsers;
   pageHistory: PageHistory;
   pages: Pages;
+  screenshotAttempts: ScreenshotAttempts;
   shares: Shares;
   spaceMembers: SpaceMembers;
   spaces: Spaces;
