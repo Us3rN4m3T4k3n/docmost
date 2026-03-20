@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Client Isolation and Read-Only Access** - Enforce server-side READER isolation, strip editor chrome, close workspace-boundary data leak
 - [x] **Phase 2: Language and Content Localization** - Language tagging, IP-based detection, client language preference, and filtered SOP visibility (completed 2026-03-19)
-- [ ] **Phase 3: Content Protection** - Verified right-click, copy, print blocks and dynamic watermark wired to correct space role
+- [x] **Phase 3: Content Protection** - Verified right-click, copy, print blocks and dynamic watermark wired to correct space role (completed 2026-03-20)
 - [ ] **Phase 4: Stripe Billing and Account Provisioning** - Self-serve checkout, automatic account creation, subscription lifecycle, and admin controls
 - [ ] **Phase 5: Railway Production Deployment** - Two-service Railway deployment with S3 storage, health check, SPA routing, and Stripe webhook wired to production URL
 
@@ -98,6 +98,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Client Isolation and Read-Only Access | 1/4 | In progress | - |
 | 2. Language and Content Localization | 2/2 | Complete   | 2026-03-19 |
-| 3. Content Protection | 3/4 | In Progress|  |
+| 3. Content Protection | 4/4 | Complete   | 2026-03-20 |
 | 4. Stripe Billing and Account Provisioning | 0/? | Not started | - |
 | 5. Railway Production Deployment | 0/? | Not started | - |

@@ -68,7 +68,7 @@
 ### Content Protection
 
 - **PROT-V2-01**: Screenshot detection attempts are persisted to database (currently in-memory only, resets on deploy)
-- **PROT-V2-02**: Admin can view a log of content protection violations per client account
+- [x] **PROT-V2-02**: Admin can view a log of content protection violations per client account
 
 ### Billing
 
