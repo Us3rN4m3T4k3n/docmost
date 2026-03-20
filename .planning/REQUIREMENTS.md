@@ -29,12 +29,12 @@
 
 ### Content Protection
 
-- [ ] **PROT-01**: Right-click context menu is disabled for users with READER space role
-- [ ] **PROT-02**: Text selection and copy-paste (Ctrl+C / Cmd+C) is disabled for READER users
-- [ ] **PROT-03**: Print and Ctrl+P / Cmd+P is blocked for READER users
+- [x] **PROT-01**: Right-click context menu is disabled for users with READER space role
+- [x] **PROT-02**: Text selection and copy-paste (Ctrl+C / Cmd+C) is disabled for READER users
+- [x] **PROT-03**: Print and Ctrl+P / Cmd+P is blocked for READER users
 - [x] **PROT-04**: Dynamic watermark showing the authenticated user's email is visible on all content pages for READER users
-- [ ] **PROT-05**: Content protection triggers on READER space role (not workspace member role — fixes existing inverted role gate bug)
-- [ ] **PROT-06**: Dev tools detection is removed (causes false positives that block legitimate clients)
+- [x] **PROT-05**: Content protection triggers on READER space role (not workspace member role — fixes existing inverted role gate bug)
+- [x] **PROT-06**: Dev tools detection is removed (causes false positives that block legitimate clients)
 
 ### Stripe Billing
 
@@ -117,12 +117,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LANG-03 | Phase 2 | Complete |
 | LANG-04 | Phase 2 | Pending |
 | LANG-05 | Phase 2 | Complete |
-| PROT-01 | Phase 3 | Pending |
-| PROT-02 | Phase 3 | Pending |
-| PROT-03 | Phase 3 | Pending |
+| PROT-01 | Phase 3 | Complete |
+| PROT-02 | Phase 3 | Complete |
+| PROT-03 | Phase 3 | Complete |
 | PROT-04 | Phase 3 | Complete |
-| PROT-05 | Phase 3 | Pending |
-| PROT-06 | Phase 3 | Pending |
+| PROT-05 | Phase 3 | Complete |
+| PROT-06 | Phase 3 | Complete |
 | BILL-01 | Phase 4 | Pending |
 | BILL-02 | Phase 4 | Pending |
 | BILL-03 | Phase 4 | Pending |
