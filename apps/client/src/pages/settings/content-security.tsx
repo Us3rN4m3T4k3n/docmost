@@ -24,11 +24,28 @@ export default function ContentSecurity() {
   const [violations, setViolations] = useState<ViolationRecord[]>([]);
   const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const fetchViolations = async () => {
+      setLoading(true);
+      try {
+        const data = await api.get("/api/security/violations");
+        setViolations(data as unknown as ViolationRecord[]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchViolations();
+  }, [isAdmin]);
+
   if (!isAdmin) {
     return null;
   }
 
-  const fetchViolations = async () => {
+  const handleReinstate = async (userId: string) => {
+    await api.post(`/api/security/reinstate/${userId}`);
     setLoading(true);
     try {
       const data = await api.get("/api/security/violations");
@@ -36,15 +53,6 @@ export default function ContentSecurity() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchViolations();
-  }, []);
-
-  const handleReinstate = async (userId: string) => {
-    await api.post(`/api/security/reinstate/${userId}`);
-    await fetchViolations();
   };
 
   const formatDate = (dateStr: string | null): string => {

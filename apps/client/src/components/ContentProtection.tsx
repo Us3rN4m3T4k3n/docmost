@@ -33,14 +33,10 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
   const userEmail = user?.email ?? '';
   const watermarkUri = isProtected ? buildWatermarkDataUri(userEmail) : null;
 
-  // Only apply protection when the space role requires it (READER users)
-  if (!isProtected) {
-    return <>{children}</>;
-  }
-
   // Keyboard event handler
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (!isProtected) return;
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
       const ctrlKey = isMac ? e.metaKey : e.ctrlKey;
 
@@ -91,25 +87,28 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
         return false;
       }
     },
-    []
+    [isProtected]
   );
 
   // Context menu handler
   const handleContextMenu = useCallback((e: MouseEvent) => {
+    if (!isProtected) return;
     e.preventDefault();
     e.stopPropagation();
     return false;
-  }, []);
+  }, [isProtected]);
 
   // Drag start handler
   const handleDragStart = useCallback((e: DragEvent) => {
+    if (!isProtected) return;
     e.preventDefault();
     e.stopPropagation();
     return false;
-  }, []);
+  }, [isProtected]);
 
   // Select start handler (for drag selection)
   const handleSelectStart = useCallback((e: Event) => {
+    if (!isProtected) return;
     const target = e.target as HTMLElement;
     // Allow selection in input fields and textareas (if any exist for member)
     if (
@@ -121,27 +120,29 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
     }
     e.preventDefault();
     return false;
-  }, []);
+  }, [isProtected]);
 
   // Copy/Cut handler
   const handleCopy = useCallback((e: ClipboardEvent) => {
+    if (!isProtected) return;
     e.preventDefault();
     e.stopPropagation();
     e.clipboardData?.clearData();
     return false;
-  }, []);
+  }, [isProtected]);
 
   const handleCut = useCallback((e: ClipboardEvent) => {
+    if (!isProtected) return;
     e.preventDefault();
     e.stopPropagation();
     e.clipboardData?.clearData();
     return false;
-  }, []);
+  }, [isProtected]);
 
   // Touch handlers for mobile
   const handleTouchStart = useCallback((e: TouchEvent) => {
+    if (!isProtected) return;
     // Detect long press
-    const touch = e.touches[0];
     const target = e.target as HTMLElement;
 
     // Allow touch on interactive elements
@@ -155,9 +156,10 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
 
     // Store touch start time
     (target as any)._touchStart = Date.now();
-  }, []);
+  }, [isProtected]);
 
   const handleTouchEnd = useCallback((e: TouchEvent) => {
+    if (!isProtected) return;
     const target = e.target as HTMLElement;
     const touchStart = (target as any)._touchStart;
 
@@ -167,9 +169,10 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
     }
 
     delete (target as any)._touchStart;
-  }, []);
+  }, [isProtected]);
 
   useEffect(() => {
+    if (!isProtected) return;
     const element = protectionRef.current;
     if (!element) return;
 
@@ -258,6 +261,7 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       readerModeObserver.disconnect();
     };
   }, [
+    isProtected,
     handleKeyDown,
     handleContextMenu,
     handleDragStart,
@@ -270,6 +274,8 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
 
   // Disable print dialog
   useEffect(() => {
+    if (!isProtected) return;
+
     const beforePrint = () => {
       alert('Printing is disabled for this content.');
       return false;
@@ -280,7 +286,12 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
     return () => {
       window.removeEventListener('beforeprint', beforePrint);
     };
-  }, []);
+  }, [isProtected]);
+
+  // Only apply protection when the space role requires it (READER users)
+  if (!isProtected) {
+    return <>{children}</>;
+  }
 
   return (
     <div ref={protectionRef} className="content-protection">
