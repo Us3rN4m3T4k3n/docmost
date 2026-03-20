@@ -1,6 +1,24 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { useAtom } from 'jotai';
+import { userAtom } from '@/features/user/atoms/current-user-atom';
 import api from '@/lib/api-client';
 import './ContentProtection.css';
+
+export function buildWatermarkDataUri(email: string): string {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='200'>
+    <text
+      x='50%'
+      y='50%'
+      font-family='sans-serif'
+      font-size='14'
+      fill='rgba(128,128,128,0.07)'
+      text-anchor='middle'
+      dominant-baseline='middle'
+      transform='rotate(-35 150 100)'
+    >${email}</text>
+  </svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
 
 interface ContentProtectionProps {
   children: React.ReactNode;
@@ -24,6 +42,11 @@ const logProtectionAttempt = async (attemptType: string, details?: string) => {
 
 export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, protected: isProtected }) => {
   const protectionRef = useRef<HTMLDivElement>(null);
+
+  // Watermark: get the authenticated user's email for dynamic SVG watermark
+  const [user] = useAtom(userAtom);
+  const userEmail = user?.email ?? '';
+  const watermarkUri = isProtected ? buildWatermarkDataUri(userEmail) : null;
 
   // Only apply protection when the space role requires it (READER users)
   if (!isProtected) {
@@ -291,6 +314,13 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       <div className="content-protected">
         {children}
       </div>
+      {watermarkUri && (
+        <div
+          className="content-watermark"
+          style={{ backgroundImage: `url("${watermarkUri}")` }}
+          aria-hidden="true"
+        />
+      )}
     </div>
   );
 };
