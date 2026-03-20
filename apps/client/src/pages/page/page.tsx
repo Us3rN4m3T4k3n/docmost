@@ -64,7 +64,7 @@ export default function Page() {
       />
 
       <ContentProtection protected={spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Page)}>
-        <ScreenshotDetection>
+        <ScreenshotDetection protected={spaceAbility.cannot(SpaceCaslAction.Manage, SpaceCaslSubject.Page)}>
           <MemoizedFullEditor
             key={page.id}
             pageId={page.id}

@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useUserRole } from '@/hooks/use-user-role';
 import api from '@/lib/api-client';
 import { logout } from '@/features/auth/services/auth-service';
 import './ScreenshotDetection.css';
 
 interface ScreenshotDetectionProps {
   children: React.ReactNode;
+  protected: boolean;
 }
 
 interface ScreenshotAttempt {
@@ -31,8 +31,7 @@ const logScreenshotAttempt = async (method: string, details?: string) => {
   }
 };
 
-export const ScreenshotDetection: React.FC<ScreenshotDetectionProps> = ({ children }) => {
-  const { isMember } = useUserRole();
+export const ScreenshotDetection: React.FC<ScreenshotDetectionProps> = ({ children, protected: isProtected }) => {
   const [showWarning, setShowWarning] = useState(false);
   const [warningMessage, setWarningMessage] = useState<{
     title: string;
@@ -43,11 +42,6 @@ export const ScreenshotDetection: React.FC<ScreenshotDetectionProps> = ({ childr
   const lastDetectionTime = useRef<number>(0);
   const visibilityChangeCount = useRef<number>(0);
   const suspiciousActivityTimer = useRef<NodeJS.Timeout | null>(null);
-
-  // Only apply detection to members
-  if (!isMember) {
-    return <>{children}</>;
-  }
 
   // Show warning modal with appropriate message based on attempt count
   const showScreenshotWarning = useCallback(async (method: string) => {
@@ -72,7 +66,7 @@ export const ScreenshotDetection: React.FC<ScreenshotDetectionProps> = ({ childr
       console.warn('[ScreenshotDetection] Failed to log to backend, using local count');
       // Continue with local count
     }
-    
+
     const count = localCount;
 
     let message;
@@ -111,7 +105,7 @@ No refund will be given.`,
 
     setWarningMessage(message!);
     setShowWarning(true);
-  }, [attemptCount, isMember]);
+  }, [attemptCount]);
 
   // Method 1: Detect common screenshot keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -125,10 +119,10 @@ No refund will be given.`,
       const key = e.key || '';
       const code = e.code || '';
       const keyCode = e.keyCode || 0;
-      
+
       // Screenshot keys: 3 (full screen), 4 (selection), 5 (screenshot app), 6 (Touch Bar if available)
       // Also check for shifted variants that some keyboard layouts produce
-      const isScreenshotKey = 
+      const isScreenshotKey =
         // Check key value (most reliable)
         ['3', '4', '5', '6'].includes(key) ||
         // Check shifted symbols that might appear on some keyboards
@@ -137,7 +131,7 @@ No refund will be given.`,
         ['Digit3', 'Digit4', 'Digit5', 'Digit6'].includes(code) ||
         // Check keyCode (final fallback)
         [51, 52, 53, 54].includes(keyCode);
-      
+
       if (isScreenshotKey) {
         console.log('[ScreenshotDetection] 🚨 macOS screenshot detected:', {
           key,
@@ -145,7 +139,7 @@ No refund will be given.`,
           keyCode,
           timestamp: new Date().toISOString()
         });
-        
+
         // Show warning immediately
         const detectedKey = key || code || keyCode;
         showScreenshotWarning(`macOS screenshot: Cmd+Shift+${detectedKey}`);
@@ -195,18 +189,10 @@ No refund will be given.`,
     // Note: Disabled because users naturally switch windows frequently
   }, []);
 
-  // Method 4: Detect clipboard access (some screenshot tools copy to clipboard)
-  const handleCopy = useCallback((e: ClipboardEvent) => {
-    // Already blocked by ContentProtection, but log if attempted
-    const target = e.target as HTMLElement;
-    if (target && !target.isContentEditable) {
-      // Potential screenshot tool trying to copy
-      showScreenshotWarning('Clipboard access attempt detected');
-    }
-  }, [showScreenshotWarning]);
-
-  // Method 5: Monitor for screenshot browser extensions
+  // Method 4: Monitor for screenshot browser extensions
   useEffect(() => {
+    if (!isProtected) return;
+
     // Some screenshot extensions inject specific elements or modify DOM
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -220,9 +206,9 @@ No refund will be given.`,
               'nimbus-capture',
               'awesome-screenshot',
             ];
-            
+
             const className = node.className || '';
-            if (suspiciousClasses.some(cls => 
+            if (suspiciousClasses.some(cls =>
               typeof className === 'string' && className.includes(cls)
             )) {
               showScreenshotWarning('Screenshot extension detected');
@@ -238,19 +224,21 @@ No refund will be given.`,
     });
 
     return () => observer.disconnect();
-  }, [showScreenshotWarning]);
+  }, [isProtected, showScreenshotWarning]);
 
   // Check for suspension status on mount
   useEffect(() => {
+    if (!isProtected) return;
+
     const checkSuspensionStatus = async () => {
       try {
         console.log('[ScreenshotDetection] Checking user suspension status...');
-        const response = await api.get('/security/screenshot-status');
+        const response = await api.get('/api/security/screenshot-status');
         const { attemptCount } = response.data;
-        
+
         console.log('[ScreenshotDetection] User attempt count:', attemptCount);
         setAttemptCount(attemptCount || 0);
-        
+
         // If user is suspended (3+ attempts), show modal immediately and block access
         if (attemptCount >= 3) {
           console.log('[ScreenshotDetection] 🚨 User is SUSPENDED - showing modal');
@@ -265,52 +253,55 @@ No refund will be given.`,
         console.warn('[ScreenshotDetection] Failed to check suspension status:', error);
       }
     };
-    
-    if (isMember) {
-      checkSuspensionStatus();
-    }
-  }, [isMember]);
+
+    checkSuspensionStatus();
+  }, [isProtected]);
 
   // Attach event listeners
   useEffect(() => {
+    if (!isProtected) return;
+
     console.log('[ScreenshotDetection] Attaching screenshot detection listeners');
     console.log('[ScreenshotDetection] Platform:', navigator.platform);
     console.log('[ScreenshotDetection] User Agent:', navigator.userAgent);
-    
+
     // Use capture phase (true) to catch events before they bubble
     // Listen on window to ensure we catch the events early
     window.addEventListener('keydown', handleKeyDown, true);
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('blur', handleBlur);
-    document.addEventListener('copy', handleCopy, true);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown, true);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('blur', handleBlur);
-      document.removeEventListener('copy', handleCopy, true);
     };
-  }, [handleKeyDown, handleVisibilityChange, handleBlur, handleCopy]);
+  }, [isProtected, handleKeyDown, handleVisibilityChange, handleBlur]);
+
+  // If not protected, render children transparently
+  if (!isProtected) {
+    return <>{children}</>;
+  }
 
   // Close warning modal (unless suspended)
-  const closeWarning = useCallback(() => {
+  const closeWarning = () => {
     // If suspended (3+ attempts), don't allow closing - force logout
     if (attemptCount >= 3) {
       console.log('[ScreenshotDetection] Cannot close - account is suspended');
       return;
     }
-    
+
     setShowWarning(false);
     // Keep warning message visible for 5 seconds before hiding
     setTimeout(() => {
       setWarningMessage(null);
     }, 300);
-  }, [attemptCount]);
+  };
 
   return (
     <>
       {children}
-      
+
       {/* Render warning modal as portal to ensure it's always on top and centered */}
       {showWarning && warningMessage && createPortal(
         <div className={`screenshot-warning-overlay ${warningMessage.severity}`}>
@@ -391,4 +382,3 @@ No refund will be given.`,
 };
 
 export default ScreenshotDetection;
-
