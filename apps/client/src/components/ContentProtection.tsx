@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { useAtom } from 'jotai';
 import { userAtom } from '@/features/user/atoms/current-user-atom';
-import api from '@/lib/api-client';
 import './ContentProtection.css';
 
 export function buildWatermarkDataUri(email: string): string {
@@ -25,20 +24,6 @@ interface ContentProtectionProps {
   protected: boolean;
 }
 
-// Dev tools detection and logging
-const logProtectionAttempt = async (attemptType: string, details?: string) => {
-  try {
-    await api.post('/api/security/protection-attempt', {
-      attemptType,
-      details,
-      timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
-    });
-  } catch (error) {
-    // Silently fail - don't let logging errors break the UI
-    console.warn('Failed to log protection attempt');
-  }
-};
 
 export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, protected: isProtected }) => {
   const protectionRef = useRef<HTMLDivElement>(null);
@@ -63,7 +48,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       if (ctrlKey && ['c', 'x', 'a'].includes(e.key.toLowerCase())) {
         e.preventDefault();
         e.stopPropagation();
-        logProtectionAttempt('keyboard_shortcut', `Blocked: ${e.key}`);
         return false;
       }
 
@@ -71,7 +55,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       if (ctrlKey && e.key.toLowerCase() === 'p') {
         e.preventDefault();
         e.stopPropagation();
-        logProtectionAttempt('print_attempt', 'Ctrl+P blocked');
         return false;
       }
 
@@ -79,7 +62,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       if (ctrlKey && e.key.toLowerCase() === 's') {
         e.preventDefault();
         e.stopPropagation();
-        logProtectionAttempt('save_attempt', 'Ctrl+S blocked');
         return false;
       }
 
@@ -87,7 +69,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       if (ctrlKey && e.key.toLowerCase() === 'u') {
         e.preventDefault();
         e.stopPropagation();
-        logProtectionAttempt('view_source_attempt', 'Ctrl+U blocked');
         return false;
       }
 
@@ -100,7 +81,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       ) {
         e.preventDefault();
         e.stopPropagation();
-        logProtectionAttempt('dev_tools_shortcut', `Blocked: ${e.key}`);
         return false;
       }
 
@@ -108,7 +88,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
       if (ctrlKey && e.shiftKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         e.stopPropagation();
-        logProtectionAttempt('dev_tools_shortcut', 'Firefox console blocked');
         return false;
       }
     },
@@ -119,7 +98,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
   const handleContextMenu = useCallback((e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    logProtectionAttempt('right_click', 'Context menu blocked');
     return false;
   }, []);
 
@@ -127,7 +105,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
   const handleDragStart = useCallback((e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    logProtectionAttempt('drag_attempt', 'Drag blocked');
     return false;
   }, []);
 
@@ -151,7 +128,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
     e.preventDefault();
     e.stopPropagation();
     e.clipboardData?.clearData();
-    logProtectionAttempt('copy_attempt', 'Copy blocked');
     return false;
   }, []);
 
@@ -159,7 +135,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
     e.preventDefault();
     e.stopPropagation();
     e.clipboardData?.clearData();
-    logProtectionAttempt('cut_attempt', 'Cut blocked');
     return false;
   }, []);
 
@@ -189,7 +164,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
     if (touchStart && Date.now() - touchStart > 500) {
       // Long press detected
       e.preventDefault();
-      logProtectionAttempt('mobile_long_press', 'Mobile selection blocked');
     }
 
     delete (target as any)._touchStart;
@@ -297,7 +271,6 @@ export const ContentProtection: React.FC<ContentProtectionProps> = ({ children, 
   // Disable print dialog
   useEffect(() => {
     const beforePrint = () => {
-      logProtectionAttempt('print_dialog', 'Print dialog opened');
       alert('Printing is disabled for this content.');
       return false;
     };

@@ -13,11 +13,11 @@
 
 ### Language & Content Localization
 
-- [ ] **LANG-01**: Content can be authored and stored in English (primary) and Brazilian Portuguese (secondary); other languages may be added later without auto-translation
+- [x] **LANG-01**: Content can be authored and stored in English (primary) and Brazilian Portuguese (secondary); other languages may be added later without auto-translation
 - [x] **LANG-02**: External client's language is detected automatically via IP geolocation on first visit
-- [ ] **LANG-03**: Client can manually select their language preference from their account settings, overriding IP detection
+- [x] **LANG-03**: Client can manually select their language preference from their account settings, overriding IP detection
 - [ ] **LANG-04**: Clients see only SOPs tagged for their language — Brazilian Portuguese clients do not see EN-only SOPs and vice versa
-- [ ] **LANG-05**: Admin and Staff can tag each page/space as English, Brazilian Portuguese, or Both when publishing
+- [x] **LANG-05**: Admin and Staff can tag each page/space as English, Brazilian Portuguese, or Both when publishing
 
 ### Client Isolation
 
@@ -32,7 +32,7 @@
 - [ ] **PROT-01**: Right-click context menu is disabled for users with READER space role
 - [ ] **PROT-02**: Text selection and copy-paste (Ctrl+C / Cmd+C) is disabled for READER users
 - [ ] **PROT-03**: Print and Ctrl+P / Cmd+P is blocked for READER users
-- [ ] **PROT-04**: Dynamic watermark showing the authenticated user's email is visible on all content pages for READER users
+- [x] **PROT-04**: Dynamic watermark showing the authenticated user's email is visible on all content pages for READER users
 - [ ] **PROT-05**: Content protection triggers on READER space role (not workspace member role — fixes existing inverted role gate bug)
 - [ ] **PROT-06**: Dev tools detection is removed (causes false positives that block legitimate clients)
 
@@ -112,15 +112,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ISOL-03 | Phase 1 | Pending |
 | ISOL-04 | Phase 1 | Pending |
 | ISOL-05 | Phase 1 | Pending |
-| LANG-01 | Phase 2 | Pending |
+| LANG-01 | Phase 2 | Complete |
 | LANG-02 | Phase 2 | Complete |
-| LANG-03 | Phase 2 | Pending |
+| LANG-03 | Phase 2 | Complete |
 | LANG-04 | Phase 2 | Pending |
-| LANG-05 | Phase 2 | Pending |
+| LANG-05 | Phase 2 | Complete |
 | PROT-01 | Phase 3 | Pending |
 | PROT-02 | Phase 3 | Pending |
 | PROT-03 | Phase 3 | Pending |
-| PROT-04 | Phase 3 | Pending |
+| PROT-04 | Phase 3 | Complete |
 | PROT-05 | Phase 3 | Pending |
 | PROT-06 | Phase 3 | Pending |
 | BILL-01 | Phase 4 | Pending |
