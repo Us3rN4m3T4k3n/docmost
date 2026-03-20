@@ -103,7 +103,9 @@ import useUserRole from "@/hooks/use-user-role";
 import api from "@/lib/api-client";
 
 const mockUseUserRole = vi.mocked(useUserRole);
-const mockApi = vi.mocked(api);
+// Cast to any to access vi mock methods — the module is mocked above with vi.fn()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockApi = api as any;
 
 const mockViolations = [
   {
