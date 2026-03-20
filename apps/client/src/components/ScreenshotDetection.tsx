@@ -234,10 +234,10 @@ No refund will be given.`,
       try {
         console.log('[ScreenshotDetection] Checking user suspension status...');
         const response = await api.get('/api/security/screenshot-status');
-        const { attemptCount } = response.data;
+        const attemptCount = response.data?.status?.attemptCount ?? response.data?.attemptCount ?? 0;
 
         console.log('[ScreenshotDetection] User attempt count:', attemptCount);
-        setAttemptCount(attemptCount || 0);
+        setAttemptCount(attemptCount);
 
         // If user is suspended (3+ attempts), show modal immediately and block access
         if (attemptCount >= 3) {
