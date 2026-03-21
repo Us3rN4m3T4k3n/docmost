@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-03-21T10:20:00.000Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-03-21T10:30:00.000Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 16
-  completed_plans: 14
+  completed_plans: 15
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 04 (Stripe Billing and Account Provisioning) — EXECUTING
-Plan: 4 of 5
+Phase: 04 (Stripe Billing and Account Provisioning) — COMPLETE
+Plan: 5 of 5 (complete)
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Plan: 4 of 5
 | Phase 04-stripe-billing-and-account-provisioning P01 | 3min | 2 tasks | 13 files |
 | Phase 04 P02 | 2min | 2 tasks | 4 files |
 | Phase 04 P04 | 15min | 2 tasks | 6 files |
+| Phase 04 P05 | 10min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Recent decisions affecting current work:
 - [Phase 04-04]: BillingLocked page shows Stripe portal button + Kiwify support text — portal endpoint returns 400 for Kiwify users, button gracefully handles failure
 - [Phase 04-04]: Portal endpoint instantiates Stripe per-request — simpler than injecting as provider for low-frequency access
 - [Phase 04-04]: Used existing BillingService.findBillingByUserId (created in 04-02) in portal endpoint
+- [Phase 04-05]: Status derivation (active/locked/cancelled) done in controller map() layer — keeps BillingService generic
+- [Phase 04-05]: useEffect gates fetchSubscribers on isAdmin — prevents 403 fetch for non-admin users
+- [Phase 04-05]: Subscribers sidebar entry has isAdmin only (no isCloud) — visible on self-hosted per CONTEXT.md Pattern 9
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-21T10:20:00.000Z
-Stopped at: Completed 04-04-PLAN.md
-Resume with: /gsd:execute-phase 3
+Last session: 2026-03-21T10:30:00.000Z
+Stopped at: Completed 04-05-PLAN.md
+Resume with: /gsd:execute-phase 5
