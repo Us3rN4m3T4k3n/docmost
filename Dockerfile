@@ -21,6 +21,7 @@ WORKDIR /app
 COPY --from=builder /app/apps/server/dist /app/apps/server/dist
 COPY --from=builder /app/apps/client/dist /app/apps/client/dist
 COPY --from=builder /app/apps/server/package.json /app/apps/server/package.json
+COPY --from=builder /app/apps/server/src/database /app/apps/server/src/database
 
 # Copy packages
 COPY --from=builder /app/packages/editor-ext/dist /app/packages/editor-ext/dist
