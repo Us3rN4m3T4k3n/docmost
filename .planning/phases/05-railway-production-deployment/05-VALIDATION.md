@@ -41,9 +41,9 @@ created: 2026-03-21
 | 5-01-01 | 01 | 1 | DEPLOY-01 | smoke | `curl -f https://client-production-dba5.up.railway.app/api/health/live` | manual | ⬜ pending |
 | 5-01-02 | 01 | 1 | DEPLOY-05 | smoke | `curl -f https://client-production-dba5.up.railway.app/api/health` | manual | ⬜ pending |
 | 5-01-03 | 01 | 1 | DEPLOY-04 | smoke | `curl -I https://client-production-dba5.up.railway.app/settings/account/profile` | manual | ⬜ pending |
+| 5-01-04 | 01 | 1 | DEPLOY-03 | smoke | Upload file, redeploy, verify file still accessible | manual | ⬜ pending |
+| 5-01-05 | 01 | 1 | DEPLOY-06 | smoke | Stripe Dashboard: Webhooks > endpoint > Send test webhook > checkout.session.completed | manual | ⬜ pending |
 | 5-02-01 | 02 | 2 | DEPLOY-02 | smoke | `curl -f https://<collab-url>.up.railway.app/api/health/live` | manual | ⬜ pending |
-| 5-03-01 | 03 | 3 | DEPLOY-03 | smoke | Upload file, redeploy, verify file still accessible | manual | ⬜ pending |
-| 5-04-01 | 04 | 4 | DEPLOY-06 | smoke | Stripe Dashboard: Webhooks > endpoint > Send test webhook > checkout.session.completed | manual | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
