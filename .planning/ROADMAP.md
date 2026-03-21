@@ -75,7 +75,7 @@ Plans:
   3. A client whose payment fails has their account locked and cannot access content until payment is resolved, after which access is automatically restored
   4. An admin can view a list of all active subscribers, see their account status, link to their Stripe customer record, and manually grant or revoke space access
   5. Replayed Stripe webhook events do not double-provision users or create duplicate accounts
-**Plans:** 1/5 plans executed
+**Plans:** 2/5 plans executed
 
 Plans:
 - [ ] 04-01-PLAN.md — Database migrations (billingLockedAt, webhook dedup tables, Kiwify columns) + BillingModule scaffold + middleware extension
@@ -106,5 +106,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Client Isolation and Read-Only Access | 1/4 | In progress | - |
 | 2. Language and Content Localization | 2/2 | Complete   | 2026-03-19 |
 | 3. Content Protection | 5/5 | Complete   | 2026-03-20 |
-| 4. Stripe Billing and Account Provisioning | 1/5 | In Progress|  |
+| 4. Stripe Billing and Account Provisioning | 2/5 | In Progress|  |
 | 5. Railway Production Deployment | 0/? | Not started | - |

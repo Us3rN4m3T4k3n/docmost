@@ -39,14 +39,14 @@
 ### Stripe Billing
 
 - [ ] **BILL-01**: A pricing/landing page exists where prospective clients can see the offer and start a Stripe Checkout session
-- [ ] **BILL-02**: On successful Stripe Checkout (`checkout.session.completed`), a user account is automatically created and added to the client space as READER
-- [ ] **BILL-03**: A welcome email is sent to the new client after account provisioning with their login details
-- [ ] **BILL-04**: On subscription cancellation (`customer.subscription.deleted`), the user's access to the client space is automatically revoked
+- [x] **BILL-02**: On successful Stripe Checkout (`checkout.session.completed`), a user account is automatically created and added to the client space as READER
+- [x] **BILL-03**: A welcome email is sent to the new client after account provisioning with their login details
+- [x] **BILL-04**: On subscription cancellation (`customer.subscription.deleted`), the user's access to the client space is automatically revoked
 - [x] **BILL-05**: Webhook events are deduplicated (idempotency table) to prevent double provisioning on Stripe retries
 - [ ] **BILL-06**: Clients can access Stripe Customer Portal to manage or cancel their own subscription
-- [ ] **BILL-07**: One account per purchase (one Stripe subscription = one user login)
+- [x] **BILL-07**: One account per purchase (one Stripe subscription = one user login)
 - [x] **BILL-08**: If a subscription payment fails, the client account is locked and access to content is revoked until payment is resolved
-- [ ] **BILL-09**: When a locked client's payment succeeds (retry or update), access is automatically restored
+- [x] **BILL-09**: When a locked client's payment succeeds (retry or update), access is automatically restored
 
 ### Admin
 
@@ -124,14 +124,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PROT-05 | Phase 3 | Complete |
 | PROT-06 | Phase 3 | Complete |
 | BILL-01 | Phase 4 | Pending |
-| BILL-02 | Phase 4 | Pending |
-| BILL-03 | Phase 4 | Pending |
-| BILL-04 | Phase 4 | Pending |
+| BILL-02 | Phase 4 | Complete |
+| BILL-03 | Phase 4 | Complete |
+| BILL-04 | Phase 4 | Complete |
 | BILL-05 | Phase 4 | Complete |
 | BILL-06 | Phase 4 | Pending |
-| BILL-07 | Phase 4 | Pending |
+| BILL-07 | Phase 4 | Complete |
 | BILL-08 | Phase 4 | Complete |
-| BILL-09 | Phase 4 | Pending |
+| BILL-09 | Phase 4 | Complete |
 | ADMIN-01 | Phase 4 | Pending |
 | ADMIN-02 | Phase 4 | Pending |
 | ADMIN-03 | Phase 4 | Pending |

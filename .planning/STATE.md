@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-21T09:38:54.469Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-21T09:43:34.419Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 16
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Plan: 1 of 5
 | Phase 03 P04 | 4 | 2 tasks | 4 files |
 | Phase 03 P05 | 2 | 2 tasks | 3 files |
 | Phase 04-stripe-billing-and-account-provisioning P01 | 3min | 2 tasks | 13 files |
+| Phase 04 P02 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 04-01]: BillingModule registered at AppModule level (not CoreModule) — billing is top-level concern independent of domain middleware
 - [Phase 04-01]: billingLockedAt check placed before suspendedAt in middleware/guard — billing lock is primary payment enforcement
 - [Phase 04-01]: gateway column defaults to 'stripe' — existing billing rows remain valid without data migration
+- [Phase 04]: Direct Kysely insert used for provisioned users — avoids hashPassword(null) in userRepo.insertUser()
+- [Phase 04]: Billing record created after transaction commits (not inside) to avoid nested transaction issues
+- [Phase 04]: Welcome email is fire-and-forget with .catch() — provision never blocks on email delivery
 
 ### Pending Todos
 
@@ -98,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-21T09:38:54.466Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-21T09:43:34.417Z
+Stopped at: Completed 04-02-PLAN.md
 Resume with: /gsd:execute-phase 3
