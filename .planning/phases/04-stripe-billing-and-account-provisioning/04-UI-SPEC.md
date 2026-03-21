@@ -1,10 +1,11 @@
 ---
 phase: 4
 slug: stripe-billing-and-account-provisioning
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-03-20
+reviewed_at: 2026-03-21
 ---
 
 # Phase 4 — UI Design Contract
@@ -42,7 +43,7 @@ Mantine uses its own spacing scale internally. All layout decisions in Phase 4 f
 | 3xl | — | 64px | Not used in Phase 4 UI scope |
 
 Exceptions:
-- Auth container top margin: 150px on desktop, 50px on mobile (existing pattern from `auth.module.css` — used for `/welcome` page)
+- Auth container top margin: inherited verbatim from `auth.module.css` — not declared or modified by Phase 4; executor must not change these values
 - Button action size in admin table rows: `size="xs"` (matches Phase 3 `content-security.tsx` pattern)
 
 ---
@@ -55,8 +56,10 @@ All type is rendered by Mantine Text, Title, and Button components. Sizes use Ma
 |------|-------------|------------|--------|-------------|
 | Body (table cell, description) | `size="sm"` | 14px | 400 | 1.5 |
 | Body standard | `size="md"` | 16px | 400 | 1.5 |
-| Label / column header | `Table.Th` default | 14px | 600 | 1.4 |
+| Label / column header | `Table.Th` with `fw={500}` | 14px | 500 | 1.4 |
 | Heading / section title | `Title order={2} fw={500}` | 24px | 500 | 1.2 |
+
+Two weights only: **400** (body) and **500** (headings and column headers). `Table.Th` default weight must be overridden with `fw={500}` to eliminate the browser default bold.
 
 Conventions confirmed from `content-security.tsx` and `forgot-password-form.tsx`:
 - `Text c="dimmed"` for secondary/help text
@@ -107,7 +110,7 @@ Follows `content-security.tsx` exactly. Components:
 | `SettingsTitle` | `title="Subscribers"` | Section heading (existing component) |
 | `Text` | `c="dimmed" mb="lg"` | Page description |
 | `Table` | — | Subscriber data table |
-| `Table.Thead / Table.Th` | — | Column headers |
+| `Table.Thead / Table.Th` | `fw={500}` | Column headers |
 | `Table.Tbody / Table.Tr / Table.Td` | — | Data rows |
 | `Badge` | `color="green/orange/red"` | Status indicator per row |
 | `Button` | `size="xs" variant="outline"` | "Revoke Access" action |
@@ -116,6 +119,8 @@ Follows `content-security.tsx` exactly. Components:
 | `Text` | `c="dimmed"` | Empty state and loading state |
 
 Admin gate: `const { isAdmin } = useUserRole(); if (!isAdmin) return null;` — identical to `content-security.tsx` and `billing.tsx`.
+
+**Primary focal point:** The subscriber data table — specifically the Status Badge column and action buttons (Revoke/Restore), which carry the highest information density and user interaction weight. All other elements (title, description) serve as supporting context.
 
 Table columns (in order):
 1. Email
@@ -180,7 +185,7 @@ All copy is sourced from CONTEXT.md decisions (locked).
 | Subscribers table loading | "Loading..." | Phase 3 pattern (content-security.tsx) |
 | Admin CTA: revoke | "Revoke Access" | CONTEXT.md locked |
 | Admin CTA: restore | "Restore Access" | CONTEXT.md locked |
-| Revoke confirmation | Modal: "Revoke access for {email}? They will immediately lose access to the client space." / Confirm: "Revoke Access" / Cancel: "Cancel" | Default (destructive action requires confirmation) |
+| Revoke confirmation | Modal: "Revoke access for {email}? They will immediately lose access to the client space." / Confirm: "Revoke Access" / Dismiss: "Keep Access" | Default (destructive action requires confirmation) |
 | Customer Portal button label | "Manage Subscription" | CONTEXT.md locked |
 | Customer Portal section title | "Manage subscription" | Matches existing manage-billing.tsx pattern |
 | Customer Portal section description | "Manage your subscription, update payment details, and cancel at any time." | Default |
@@ -293,11 +298,11 @@ No third-party registries. All components from `@mantine/core` already installed
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** APPROVED — 2026-03-21
