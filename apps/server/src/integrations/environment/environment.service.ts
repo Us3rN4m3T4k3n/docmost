@@ -198,6 +198,10 @@ export class EnvironmentService {
     return this.configService.get<string>('KIWIFY_CLIENT_SPACE_ID');
   }
 
+  getKiwifyWebhookToken(): string {
+    return this.configService.get<string>('KIWIFY_WEBHOOK_TOKEN');
+  }
+
   getBillingTrialDays(): number {
     return parseInt(this.configService.get<string>('BILLING_TRIAL_DAYS', '14'));
   }

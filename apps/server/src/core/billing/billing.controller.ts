@@ -22,6 +22,8 @@ import { User } from '@docmost/db/types/entity.types';
 import { Workspace } from '@docmost/db/types/entity.types';
 import { BillingService } from './services/billing.service';
 import { UserProvisioningService } from './services/user-provisioning.service';
+import { StripeWebhookService } from './services/stripe-webhook.service';
+import { KiwifyWebhookService } from './services/kiwify-webhook.service';
 import { EnvironmentService } from '../../integrations/environment/environment.service';
 
 @Controller('billing')
@@ -30,6 +32,8 @@ export class BillingController {
     private readonly billingService: BillingService,
     private readonly environmentService: EnvironmentService,
     private readonly userProvisioningService: UserProvisioningService,
+    private readonly stripeWebhookService: StripeWebhookService,
+    private readonly kiwifyWebhookService: KiwifyWebhookService,
     @InjectKysely() private readonly db: KyselyDB,
   ) {}
 
@@ -39,12 +43,22 @@ export class BillingController {
     @Req() req: any,
     @Headers('stripe-signature') sig: string,
   ) {
+    let event: Stripe.Event;
+    try {
+      event = this.stripeWebhookService.verifyAndParse(req.rawBody, sig);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      throw new BadRequestException(`Webhook signature failed: ${msg}`);
+    }
+    await this.stripeWebhookService.handle(event);
     return { received: true };
   }
 
   @Post('kiwify/webhook')
   @HttpCode(HttpStatus.OK)
   async kiwifyWebhook(@Body() body: any) {
+    this.kiwifyWebhookService.verify(body);
+    await this.kiwifyWebhookService.handle(body);
     return { received: true };
   }
 
