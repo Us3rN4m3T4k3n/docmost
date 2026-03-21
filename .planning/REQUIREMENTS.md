@@ -43,7 +43,7 @@
 - [x] **BILL-03**: A welcome email is sent to the new client after account provisioning with their login details
 - [x] **BILL-04**: On subscription cancellation (`customer.subscription.deleted`), the user's access to the client space is automatically revoked
 - [x] **BILL-05**: Webhook events are deduplicated (idempotency table) to prevent double provisioning on Stripe retries
-- [ ] **BILL-06**: Clients can access Stripe Customer Portal to manage or cancel their own subscription
+- [x] **BILL-06**: Clients can access Stripe Customer Portal to manage or cancel their own subscription
 - [x] **BILL-07**: One account per purchase (one Stripe subscription = one user login)
 - [x] **BILL-08**: If a subscription payment fails, the client account is locked and access to content is revoked until payment is resolved
 - [x] **BILL-09**: When a locked client's payment succeeds (retry or update), access is automatically restored
@@ -128,7 +128,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BILL-03 | Phase 4 | Complete |
 | BILL-04 | Phase 4 | Complete |
 | BILL-05 | Phase 4 | Complete |
-| BILL-06 | Phase 4 | Pending |
+| BILL-06 | Phase 4 | Complete |
 | BILL-07 | Phase 4 | Complete |
 | BILL-08 | Phase 4 | Complete |
 | BILL-09 | Phase 4 | Complete |

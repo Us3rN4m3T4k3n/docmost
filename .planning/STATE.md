@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-21T09:43:34.419Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-03-21T10:20:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 16
-  completed_plans: 12
+  completed_plans: 14
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 04 (Stripe Billing and Account Provisioning) — EXECUTING
-Plan: 1 of 5
+Plan: 4 of 5
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: 1 of 5
 | Phase 03 P05 | 2 | 2 tasks | 3 files |
 | Phase 04-stripe-billing-and-account-provisioning P01 | 3min | 2 tasks | 13 files |
 | Phase 04 P02 | 2min | 2 tasks | 4 files |
+| Phase 04 P04 | 15min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 04]: Direct Kysely insert used for provisioned users — avoids hashPassword(null) in userRepo.insertUser()
 - [Phase 04]: Billing record created after transaction commits (not inside) to avoid nested transaction issues
 - [Phase 04]: Welcome email is fire-and-forget with .catch() — provision never blocks on email delivery
+- [Phase 04-04]: BillingLocked page shows Stripe portal button + Kiwify support text — portal endpoint returns 400 for Kiwify users, button gracefully handles failure
+- [Phase 04-04]: Portal endpoint instantiates Stripe per-request — simpler than injecting as provider for low-frequency access
+- [Phase 04-04]: Used existing BillingService.findBillingByUserId (created in 04-02) in portal endpoint
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-21T09:43:34.417Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-21T10:20:00.000Z
+Stopped at: Completed 04-04-PLAN.md
 Resume with: /gsd:execute-phase 3
