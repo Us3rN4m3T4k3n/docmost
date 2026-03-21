@@ -3,7 +3,7 @@ import { Kysely } from 'kysely';
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .alterTable('billing')
-    .addColumn('user_id', 'uuid', (col) => col.references('users(id)'))
+    .addColumn('user_id', 'uuid', (col) => col.references('users.id'))
     .execute();
 
   await db.schema
