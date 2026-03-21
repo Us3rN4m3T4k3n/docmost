@@ -33,7 +33,10 @@ api.interceptors.response.use(
           break;
         }
         case 403:
-          // Handle forbidden error
+          // Handle billing locked error — redirect to payment failure page
+          if (error.response.data?.error === 'BillingLocked') {
+            window.location.href = '/billing-locked';
+          }
           break;
         case 404:
           // Handle not found error

@@ -38,6 +38,8 @@ import { MfaSetupRequiredPage } from "@/ee/mfa/pages/mfa-setup-required-page";
 import SpaceTrash from "@/pages/space/space-trash.tsx";
 import UserApiKeys from "@/ee/api-key/pages/user-api-keys";
 import WorkspaceApiKeys from "@/ee/api-key/pages/workspace-api-keys";
+import BillingSuccess from "@/pages/billing-success";
+import BillingLocked from "@/features/billing/components/billing-locked";
 
 export default function App() {
   const { t } = useTranslation();
@@ -52,6 +54,8 @@ export default function App() {
         <Route path={"/invites/:invitationId"} element={<InviteSignup />} />
         <Route path={"/forgot-password"} element={<ForgotPassword />} />
         <Route path={"/password-reset"} element={<PasswordReset />} />
+        <Route path={"/welcome"} element={<BillingSuccess />} />
+        <Route path={"/billing-locked"} element={<BillingLocked />} />
         <Route path={"/login/mfa"} element={<MfaChallengePage />} />
         <Route path={"/login/mfa/setup"} element={<MfaSetupRequiredPage />} />
 
