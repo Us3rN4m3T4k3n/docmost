@@ -79,6 +79,7 @@ async function bootstrap() {
         '/api/auth/setup',
         '/api/health',
         '/api/billing/stripe/webhook',
+        '/api/billing/kiwify/webhook',
         '/api/workspace/check-hostname',
         '/api/sso/google',
         '/api/workspace/create',

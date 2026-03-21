@@ -20,16 +20,26 @@ export class SuspendedUserMiddleware implements NestMiddleware {
     }
 
     try {
-      // Check if user is suspended
+      // Check if user is suspended or billing-locked
       const dbUser = await this.db
         .selectFrom('users')
-        .select(['suspendedAt', 'suspensionReason'])
+        .select(['suspendedAt', 'suspensionReason', 'billingLockedAt'])
         .where('id', '=', user.id)
         .executeTakeFirst();
 
+      if (dbUser?.billingLockedAt) {
+        this.logger.warn(`Blocked billing-locked user ${user.id} from accessing: ${req.url}`);
+
+        throw new ForbiddenException({
+          message: 'Billing Payment Failed',
+          error: 'BillingLocked',
+          statusCode: 403,
+        });
+      }
+
       if (dbUser?.suspendedAt) {
         this.logger.warn(`Blocked suspended user ${user.id} from accessing: ${req.url}`);
-        
+
         throw new ForbiddenException({
           message: 'Account Suspended',
           reason: dbUser.suspensionReason || 'Your account has been suspended due to policy violations',

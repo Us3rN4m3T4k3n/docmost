@@ -43,6 +43,7 @@ export class CoreModule implements NestModule {
         { path: 'health', method: RequestMethod.GET },
         { path: 'health/live', method: RequestMethod.GET },
         { path: 'billing/stripe/webhook', method: RequestMethod.POST },
+        { path: 'billing/kiwify/webhook', method: RequestMethod.POST },
       )
       .forRoutes('*');
 
@@ -58,6 +59,8 @@ export class CoreModule implements NestModule {
         { path: 'auth/verify-token', method: RequestMethod.POST },
         { path: 'health', method: RequestMethod.GET },
         { path: 'health/live', method: RequestMethod.GET },
+        { path: 'billing/stripe/webhook', method: RequestMethod.POST },
+        { path: 'billing/kiwify/webhook', method: RequestMethod.POST },
       )
       .forRoutes('*');
   }
