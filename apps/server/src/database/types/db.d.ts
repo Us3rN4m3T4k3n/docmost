@@ -120,8 +120,11 @@ export interface Billing {
   currency: string | null;
   deletedAt: Timestamp | null;
   endedAt: Timestamp | null;
+  gateway: Generated<string>;
   id: Generated<string>;
   interval: string | null;
+  kiwifyCustomerEmail: string | null;
+  kiwifySubscriptionId: string | null;
   metadata: Json | null;
   periodEndAt: Timestamp | null;
   periodStartAt: Timestamp;
@@ -137,6 +140,7 @@ export interface Billing {
   tieredUnitAmount: Int8 | null;
   tieredUpTo: string | null;
   updatedAt: Generated<Timestamp>;
+  userId: string | null;
   workspaceId: string;
 }
 
@@ -294,6 +298,7 @@ export interface UserMfa {
 
 export interface Users {
   avatarUrl: string | null;
+  billingLockedAt: Timestamp | null;
   createdAt: Generated<Timestamp>;
   deactivatedAt: Timestamp | null;
   deletedAt: Timestamp | null;
@@ -374,6 +379,20 @@ export interface ScreenshotAttempts {
   createdAt: Generated<Timestamp>;
 }
 
+export interface StripeWebhookEvents {
+  id: Generated<string>;
+  eventId: string;
+  eventType: string;
+  processedAt: Generated<Timestamp>;
+}
+
+export interface KiwifyWebhookEvents {
+  id: Generated<string>;
+  orderId: string;
+  eventType: string;
+  processedAt: Generated<Timestamp>;
+}
+
 export interface DB {
   apiKeys: ApiKeys;
   attachments: Attachments;
@@ -385,12 +404,14 @@ export interface DB {
   fileTasks: FileTasks;
   groups: Groups;
   groupUsers: GroupUsers;
+  kiwifyWebhookEvents: KiwifyWebhookEvents;
   pageHistory: PageHistory;
   pages: Pages;
   screenshotAttempts: ScreenshotAttempts;
   shares: Shares;
   spaceMembers: SpaceMembers;
   spaces: Spaces;
+  stripeWebhookEvents: StripeWebhookEvents;
   userMfa: UserMfa;
   users: Users;
   userTokens: UserTokens;
