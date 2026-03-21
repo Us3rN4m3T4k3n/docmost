@@ -8,9 +8,6 @@ import {
   FileMigrationProvider,
 } from 'kysely';
 import { run } from 'kysely-migration-cli';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 const migrationFolder = path.join(__dirname, './migrations');
 
