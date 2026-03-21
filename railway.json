@@ -5,7 +5,8 @@
     "dockerfilePath": "Dockerfile"
   },
   "deploy": {
-    "startCommand": "pnpm --filter server migration:latest && pnpm --filter server start:prod",
+    "preDeployCommand": "pnpm --filter server migration:latest",
+    "startCommand": "pnpm --filter server start:prod",
     "healthcheckPath": "/api/health/live",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
