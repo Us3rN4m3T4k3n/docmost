@@ -108,6 +108,12 @@ const groupedData: DataGroup[] = [
         isAdmin: true,
       },
       {
+        label: "Subscribers",
+        icon: IconUsers,
+        path: "/settings/subscribers",
+        isAdmin: true,
+      },
+      {
         label: "API management",
         icon: IconKey,
         path: "/settings/api-keys",
