@@ -56,12 +56,12 @@
 
 ### Deployment
 
-- [ ] **DEPLOY-01**: Application is live and fully accessible on Railway URL (no 404, no timeout)
+- [x] **DEPLOY-01**: Application is live and fully accessible on Railway URL (no 404, no timeout)
 - [ ] **DEPLOY-02**: Main NestJS server and Hocuspocus collaboration server run as two separate Railway services
-- [ ] **DEPLOY-03**: File storage is configured to use S3 (not local ephemeral filesystem)
-- [ ] **DEPLOY-04**: SPA routing works correctly — all client-side routes resolve to the React app (no 404 on refresh)
-- [ ] **DEPLOY-05**: A health check endpoint at `/api/health` returns 200 for Railway deployment verification
-- [ ] **DEPLOY-06**: Stripe webhook URL is registered in Stripe Dashboard pointing to the production Railway URL
+- [x] **DEPLOY-03**: File storage is configured to use S3 (not local ephemeral filesystem)
+- [x] **DEPLOY-04**: SPA routing works correctly — all client-side routes resolve to the React app (no 404 on refresh)
+- [x] **DEPLOY-05**: A health check endpoint at `/api/health` returns 200 for Railway deployment verification
+- [x] **DEPLOY-06**: Stripe webhook URL is registered in Stripe Dashboard pointing to the production Railway URL
 
 ## v2 Requirements
 
@@ -135,12 +135,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ADMIN-01 | Phase 4 | Pending |
 | ADMIN-02 | Phase 4 | Pending |
 | ADMIN-03 | Phase 4 | Pending |
-| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-01 | Phase 5 | Complete |
 | DEPLOY-02 | Phase 5 | Pending |
-| DEPLOY-03 | Phase 5 | Pending |
-| DEPLOY-04 | Phase 5 | Pending |
-| DEPLOY-05 | Phase 5 | Pending |
-| DEPLOY-06 | Phase 5 | Pending |
+| DEPLOY-03 | Phase 5 | Complete |
+| DEPLOY-04 | Phase 5 | Complete |
+| DEPLOY-05 | Phase 5 | Complete |
+| DEPLOY-06 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 37 total

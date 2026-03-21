@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-21T15:08:03.019Z"
+stopped_at: "Completed 05-01: railway.json updated, awaiting human Task 2 (Railway env vars + deploy)"
+last_updated: "2026-03-21T15:27:41.482Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 16
-  completed_plans: 15
+  total_plans: 18
+  completed_plans: 16
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Paying clients can access the agency's SOPs in a protected, read-only environment they cannot easily copy or extract from.
-**Current focus:** Phase 04 — Stripe Billing and Account Provisioning
+**Current focus:** Phase 05 — railway-production-deployment
 
 ## Current Position
 
-Phase: 04 (Stripe Billing and Account Provisioning) — COMPLETE
-Plan: 5 of 5 (complete)
+Phase: 05 (railway-production-deployment) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Plan: 5 of 5 (complete)
 | Phase 04 P02 | 2min | 2 tasks | 4 files |
 | Phase 04 P04 | 15min | 2 tasks | 6 files |
 | Phase 04 P05 | 10min | 2 tasks | 5 files |
+| Phase 05-railway-production-deployment P01 | 1min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,7 @@ Recent decisions affecting current work:
 - [Phase 04-05]: Status derivation (active/locked/cancelled) done in controller map() layer — keeps BillingService generic
 - [Phase 04-05]: useEffect gates fetchSubscribers on isAdmin — prevents 403 fetch for non-admin users
 - [Phase 04-05]: Subscribers sidebar entry has isAdmin only (no isCloud) — visible on self-hosted per CONTEXT.md Pattern 9
+- [Phase 05-01]: Migration-first start command: chain migration:latest before start:prod so Railway deploys always run pending Kysely migrations automatically
 
 ### Pending Todos
 
@@ -110,6 +112,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-21T15:08:03.010Z
-Stopped at: Phase 5 context gathered
+Last session: 2026-03-21T15:27:41.480Z
+Stopped at: Completed 05-01: railway.json updated, awaiting human Task 2 (Railway env vars + deploy)
 Resume with: /gsd:execute-phase 5
