@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { promises as fs } from 'fs';
-import pg from 'pg';
+import * as pg from 'pg';
 import {
   Kysely,
   Migrator,
