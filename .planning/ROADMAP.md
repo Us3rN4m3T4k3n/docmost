@@ -75,7 +75,14 @@ Plans:
   3. A client whose payment fails has their account locked and cannot access content until payment is resolved, after which access is automatically restored
   4. An admin can view a list of all active subscribers, see their account status, link to their Stripe customer record, and manually grant or revoke space access
   5. Replayed Stripe webhook events do not double-provision users or create duplicate accounts
-**Plans**: TBD
+**Plans:** 5 plans
+
+Plans:
+- [ ] 04-01-PLAN.md — Database migrations (billingLockedAt, webhook dedup tables, Kiwify columns) + BillingModule scaffold + middleware extension
+- [ ] 04-02-PLAN.md — UserProvisioningService (provision/revoke/lock/unlock) + welcome email template
+- [ ] 04-03-PLAN.md — Stripe and Kiwify webhook handlers with idempotency
+- [ ] 04-04-PLAN.md — Client UI: /welcome page, billing-locked error page, customer portal button
+- [ ] 04-05-PLAN.md — Admin subscribers view (API + UI + sidebar entry)
 
 ### Phase 5: Railway Production Deployment
 **Goal**: The application is live and fully functional on Railway with two services, S3 storage, Stripe webhook connected to the production URL, and all routes accessible
@@ -99,5 +106,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Client Isolation and Read-Only Access | 1/4 | In progress | - |
 | 2. Language and Content Localization | 2/2 | Complete   | 2026-03-19 |
 | 3. Content Protection | 5/5 | Complete   | 2026-03-20 |
-| 4. Stripe Billing and Account Provisioning | 0/? | Not started | - |
+| 4. Stripe Billing and Account Provisioning | 0/5 | Not started | - |
 | 5. Railway Production Deployment | 0/? | Not started | - |
