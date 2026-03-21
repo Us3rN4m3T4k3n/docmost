@@ -1,5 +1,4 @@
 import { Kysely, sql } from 'kysely';
-import { UserRole } from '../../common/helpers/types/permission';
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
@@ -14,7 +13,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('custom_domain', 'varchar', (col) => col)
     .addColumn('settings', 'jsonb', (col) => col)
     .addColumn('default_role', 'varchar', (col) =>
-      col.defaultTo(UserRole.MEMBER).notNull(),
+      col.defaultTo('member').notNull(),
     )
     .addColumn('email_domains', sql`varchar[]`, (col) => col.defaultTo('{}'))
     .addColumn('default_space_id', 'uuid', (col) => col)
