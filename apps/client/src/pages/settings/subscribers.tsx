@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Table, Badge, Button, Text, Anchor } from '@mantine/core';
 import { modals } from '@mantine/modals';
-import { SettingsTitle } from '@/components/settings/settings-title';
+import SettingsTitle from '@/components/settings/settings-title';
 import useUserRole from '@/hooks/use-user-role.tsx';
 import { getAppName } from '@/lib/config';
 import api from '@/lib/api-client';
