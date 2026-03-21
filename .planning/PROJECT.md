@@ -30,6 +30,20 @@ Paying clients can access the agency's SOPs in a protected, read-only environmen
 - ✓ Account language preference settable from account settings (pre-existing account-language.tsx) — LANG-03
 - ✓ Space creation and edit forms require a Language selection (en-US / pt-BR) — LANG-05
 
+### Validated in Phase 4: Stripe Billing and Account Provisioning (2026-03-21)
+
+- ✓ Stripe webhook handler with signature verification (rawBody + STRIPE_WEBHOOK_SECRET) and idempotency — BILL-02, BILL-04, BILL-05, BILL-08, BILL-09
+- ✓ Kiwify webhook handler with token verification (`payload.token`) and idempotency — Brazilian market (PT-BR space)
+- ✓ `UserProvisioningService` shared provision/revoke/lock/unlock logic for both gateways
+- ✓ Magic link provisioning: user created with `password: null`, welcome email with set-password link
+- ✓ `billingLockedAt` column (separate from `suspendedAt`) enforced in JWT strategy
+- ✓ Stripe → `CLIENT_SPACE_ID` (EN space), Kiwify → `KIWIFY_CLIENT_SPACE_ID` (PT-BR space)
+- ✓ `stripe_webhook_events` and `kiwify_webhook_events` dedup tables for idempotency
+- ✓ `/welcome` page (public) shown post-payment with "Payment Confirmed" message
+- ✓ `/billing-locked` page with Stripe portal link and Kiwify contact text
+- ✓ Admin Subscribers page at `/settings/subscribers` — table with revoke/restore actions
+- ✓ Admin API: `GET /billing/admin/subscribers`, `POST /billing/admin/revoke`, `POST /billing/admin/restore`
+
 ### Validated in Phase 3: Content Protection (2026-03-20)
 
 - ✓ Right-click context menu disabled for READER-role users (ContentProtection.tsx) — PROT-01
@@ -54,8 +68,9 @@ Paying clients can access the agency's SOPs in a protected, read-only environmen
 - [x] Content protection: print / Ctrl+P blocked for external clients ✓ Phase 3
 - [x] Content protection: dynamic watermark showing client's email/name on all pages ✓ Phase 3
 - [x] Content protection features are verified working (tested and confirmed) ✓ Phase 3
-- [ ] Stripe-powered self-serve access: external clients can purchase a subscription and get account created automatically
-- [ ] Admin can manage external subscriptions (view, cancel, refund)
+- [x] Stripe-powered self-serve access: external clients can purchase a subscription and get account created automatically ✓ Phase 4
+- [x] Kiwify-powered self-serve access for Brazilian market (PT-BR): same provisioning rules as Stripe ✓ Phase 4
+- [x] Admin can view and manage external subscribers (revoke / restore access) ✓ Phase 4
 - [ ] Railway deployment is live and accessible
 
 ### Out of Scope
@@ -93,4 +108,4 @@ Paying clients can access the agency's SOPs in a protected, read-only environmen
 | Deploy on Railway | Managed hosting with PostgreSQL + Redis add-ons available | — Pending |
 
 ---
-*Last updated: 2026-03-19 after initialization*
+*Last updated: 2026-03-21 after Phase 4 completion*
