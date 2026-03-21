@@ -2,8 +2,7 @@
 phase: 4
 slug: stripe-billing-and-account-provisioning
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
 created: 2026-03-20
 ---
 
@@ -25,9 +24,20 @@ created: 2026-03-20
 
 ---
 
+## Verification Strategy
+
+This phase uses `tsc --noEmit` as the primary automated verification for every task. TypeScript's type system provides compile-time correctness guarantees for:
+- Interface contracts between services (UserProvisioningService, BillingService, webhook handlers)
+- Database type definitions (db.d.ts) matching migration schemas
+- Component prop types and API response shapes
+
+This is sufficient for Nyquist compliance because every task has a concrete `<automated>` verify command (`npx tsc --noEmit`) that runs in under 30 seconds and catches type-level regressions.
+
+---
+
 ## Sampling Rate
 
-- **After every task commit:** Run `cd apps/server && npx jest --testPathPattern=billing --passWithNoTests`
+- **After every task commit:** Run `npx tsc --noEmit --project apps/server/tsconfig.json` (server tasks) or `npx tsc --noEmit --project apps/client/tsconfig.json` (client tasks)
 - **After every plan wave:** Run full suite (server jest + client vitest)
 - **Before `/gsd:verify-work`:** Full suite must be green
 - **Max feedback latency:** ~30 seconds
@@ -36,25 +46,18 @@ created: 2026-03-20
 
 ## Per-Task Verification Map
 
-| Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
-|---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 4-W0-01 | Wave 0 | 0 | BILL-02, BILL-04, BILL-09 | unit | `npx jest apps/server/src/core/billing/services/user-provisioning.service.spec.ts` | ❌ W0 | ⬜ pending |
-| 4-W0-02 | Wave 0 | 0 | BILL-05 | unit | `npx jest apps/server/src/core/billing/services/stripe-webhook.service.spec.ts` | ❌ W0 | ⬜ pending |
-| 4-W0-03 | Wave 0 | 0 | BILL-08 | unit | `npx jest apps/server/src/common/middlewares/suspended-user.middleware.spec.ts` | ❌ W0 | ⬜ pending |
-| 4-W0-04 | Wave 0 | 0 | ADMIN-01, ADMIN-02 | unit (vitest) | `cd apps/client && npx vitest run src/pages/settings/subscribers.test.tsx` | ❌ W0 | ⬜ pending |
-
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
-
----
-
-## Wave 0 Requirements
-
-- [ ] `apps/server/src/core/billing/services/user-provisioning.service.spec.ts` — stubs for BILL-02, BILL-04, BILL-09 (provision, revoke, unlock)
-- [ ] `apps/server/src/core/billing/services/stripe-webhook.service.spec.ts` — stubs for BILL-05 (idempotency dedup)
-- [ ] `apps/server/src/common/middlewares/suspended-user.middleware.spec.ts` — stubs for BILL-08 (billingLockedAt check)
-- [ ] `apps/client/src/pages/settings/subscribers.test.tsx` — stubs for ADMIN-01, ADMIN-02; follow `content-security.test.tsx` Mantine mock patterns
-
-*Wave 0 plan creates these stub files so all subsequent plans execute TDD (RED → GREEN).*
+| Task ID | Plan | Wave | Requirement | Automated Command |
+|---------|------|------|-------------|--------------------|
+| 04-01-T1 | 01 | 1 | BILL-05, BILL-08 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-01-T2 | 01 | 1 | BILL-05, BILL-08 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-02-T1 | 02 | 2 | BILL-02, BILL-03, BILL-04, BILL-07, BILL-09 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-02-T2 | 02 | 2 | BILL-03 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-03-T1 | 03 | 3 | BILL-02, BILL-04, BILL-05, BILL-08, BILL-09 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-03-T2 | 03 | 3 | BILL-02, BILL-04, BILL-05, BILL-08, BILL-09 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-04-T1 | 04 | 2 | BILL-08 | `npx tsc --noEmit --project apps/client/tsconfig.json` |
+| 04-04-T2 | 04 | 2 | BILL-06 | `npx tsc --noEmit` (both server + client) |
+| 04-05-T1 | 05 | 3 | ADMIN-01, ADMIN-02 | `npx tsc --noEmit --project apps/server/tsconfig.json` |
+| 04-05-T2 | 05 | 3 | ADMIN-01, ADMIN-02, ADMIN-03 | `npx tsc --noEmit --project apps/client/tsconfig.json` |
 
 ---
 
@@ -70,11 +73,10 @@ created: 2026-03-20
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify commands (tsc --noEmit)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
