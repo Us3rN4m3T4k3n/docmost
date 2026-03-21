@@ -6,7 +6,6 @@
   },
   "deploy": {
     "preDeployCommand": "pnpm --filter server migration:latest:prod",
-    "startCommand": "pnpm --filter server start:prod",
     "healthcheckPath": "/api/health/live",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
