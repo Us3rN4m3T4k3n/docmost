@@ -94,7 +94,11 @@ Plans:
   3. File attachments (images, PDFs) persist across Railway redeploys — they are stored in S3, not the ephemeral container filesystem
   4. The `/api/health` endpoint returns HTTP 200, satisfying Railway's deployment health check
   5. Stripe webhooks reach the production endpoint and trigger account provisioning end-to-end in the live environment
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Update start command for migrations, configure Railway env vars, deploy main service
+- [ ] 05-02-PLAN.md — Create collab Railway service, wire COLLAB_URL, verify S3 file persistence
 
 ## Progress
 
@@ -107,4 +111,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Language and Content Localization | 2/2 | Complete   | 2026-03-19 |
 | 3. Content Protection | 5/5 | Complete   | 2026-03-20 |
 | 4. Stripe Billing and Account Provisioning | 5/5 | Complete   | 2026-03-21 |
-| 5. Railway Production Deployment | 0/? | Not started | - |
+| 5. Railway Production Deployment | 0/2 | Not started | - |
