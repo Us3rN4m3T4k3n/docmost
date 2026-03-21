@@ -31,7 +31,7 @@ async function bootstrap() {
 
   const logger = new Logger('CollabServer');
 
-  const port = process.env.COLLAB_PORT || process.env.PORT || 3001;
+  const port = Number(process.env.COLLAB_PORT || process.env.PORT) || 3001;
   await app.listen(port, '0.0.0.0', () => {
     logger.log(`Listening on http://127.0.0.1:${port}`);
   });
