@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-stopped_at: Completed 03-05-PLAN.md
-last_updated: "2026-03-20T20:31:27.885Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-21T09:38:54.469Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 11
-  completed_plans: 10
+  total_plans: 16
+  completed_plans: 11
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Paying clients can access the agency's SOPs in a protected, read-only environment they cannot easily copy or extract from.
-**Current focus:** Phase 03 — content-protection
+**Current focus:** Phase 04 — Stripe Billing and Account Provisioning
 
 ## Current Position
 
-Phase: 03 (content-protection) — EXECUTING
+Phase: 04 (Stripe Billing and Account Provisioning) — EXECUTING
 Plan: 1 of 5
 
 ## Performance Metrics
@@ -52,6 +52,7 @@ Plan: 1 of 5
 | Phase 03 P01 | 8 | 3 tasks | 7 files |
 | Phase 03 P04 | 4 | 2 tasks | 4 files |
 | Phase 03 P05 | 2 | 2 tasks | 3 files |
+| Phase 04-stripe-billing-and-account-provisioning P01 | 3min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 03]: [Phase 03-04]: Table always renders column headers even for empty violations list — empty state shown as tbody row
 - [Phase 03]: [Phase 03-05]: Hooks guard added inside useCallback/useEffect bodies — explicit isProtected guard as first line keeps handlers as safe no-ops when unprotected
 - [Phase 03]: [Phase 03-05]: response.data?.status?.attemptCount ?? response.data?.attemptCount ?? 0 — defensive fallback chain reads correct nested API response field
+- [Phase 04-01]: BillingModule registered at AppModule level (not CoreModule) — billing is top-level concern independent of domain middleware
+- [Phase 04-01]: billingLockedAt check placed before suspendedAt in middleware/guard — billing lock is primary payment enforcement
+- [Phase 04-01]: gateway column defaults to 'stripe' — existing billing rows remain valid without data migration
 
 ### Pending Todos
 
@@ -94,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20T20:28:35.535Z
-Stopped at: Completed 03-05-PLAN.md
+Last session: 2026-03-21T09:38:54.466Z
+Stopped at: Completed 04-01-PLAN.md
 Resume with: /gsd:execute-phase 3
