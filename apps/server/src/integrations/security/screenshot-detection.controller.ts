@@ -12,7 +12,7 @@ import {
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { ScreenshotDetectionService } from './screenshot-detection.service';
 import { ScreenshotAttemptDto } from './dto/screenshot-attempt.dto';
-import { AuthUser } from '@/common/decorators/auth-user.decorator';
+import { AuthUser } from '../../common/decorators/auth-user.decorator';
 import { User } from '@docmost/db/types/entity.types';
 
 @UseGuards(JwtAuthGuard)

@@ -109,7 +109,7 @@ export class TokenService {
       type: JwtType.API_KEY,
     };
 
-    return this.jwtService.sign(payload, expiresIn ? { expiresIn } : {});
+    return this.jwtService.sign(payload, expiresIn ? ({ expiresIn } as any) : undefined);
   }
 
   async verifyJwt(token: string, tokenType: string) {
