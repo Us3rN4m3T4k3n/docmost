@@ -9,13 +9,19 @@ import {
   HttpStatus,
   UseGuards,
   BadRequestException,
+  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import Stripe from 'stripe';
+import { InjectKysely } from 'nestjs-kysely';
+import { KyselyDB } from '../../database/types/kysely.types';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { AuthUser } from '../../common/decorators/auth-user.decorator';
+import { AuthWorkspace } from '../../common/decorators/auth-workspace.decorator';
 import { User } from '@docmost/db/types/entity.types';
+import { Workspace } from '@docmost/db/types/entity.types';
 import { BillingService } from './services/billing.service';
+import { UserProvisioningService } from './services/user-provisioning.service';
 import { EnvironmentService } from '../../integrations/environment/environment.service';
 
 @Controller('billing')
@@ -23,6 +29,8 @@ export class BillingController {
   constructor(
     private readonly billingService: BillingService,
     private readonly environmentService: EnvironmentService,
+    private readonly userProvisioningService: UserProvisioningService,
+    @InjectKysely() private readonly db: KyselyDB,
   ) {}
 
   @Post('stripe/webhook')
@@ -63,5 +71,100 @@ export class BillingController {
     });
 
     return { url: session.url };
+  }
+
+  @Get('admin/subscribers')
+  @UseGuards(JwtAuthGuard)
+  async getSubscribers(
+    @AuthUser() user: User,
+    @AuthWorkspace() workspace: Workspace,
+  ) {
+    if (user.role !== 'admin' && user.role !== 'owner') {
+      throw new ForbiddenException();
+    }
+
+    const rows = await this.billingService.getSubscribers(workspace.id);
+
+    return rows.map((row) => {
+      let status: 'active' | 'locked' | 'cancelled';
+      if (row.billingLockedAt) {
+        status = row.status === 'canceled' ? 'cancelled' : 'locked';
+      } else {
+        status = 'active';
+      }
+
+      return {
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        gateway: row.gateway,
+        status,
+        stripeCustomerId: row.stripeCustomerId,
+      };
+    });
+  }
+
+  @Post('admin/revoke')
+  @UseGuards(JwtAuthGuard)
+  async revokeAccess(
+    @AuthUser() user: User,
+    @AuthWorkspace() workspace: Workspace,
+    @Body() body: { userId: string },
+  ) {
+    if (user.role !== 'admin' && user.role !== 'owner') {
+      throw new ForbiddenException();
+    }
+
+    const targetUser = await this.db
+      .selectFrom('users')
+      .select(['email'])
+      .where('id', '=', body.userId)
+      .executeTakeFirst();
+
+    if (!targetUser) {
+      throw new NotFoundException();
+    }
+
+    await this.userProvisioningService.revoke(targetUser.email, workspace.id);
+    return { success: true };
+  }
+
+  @Post('admin/restore')
+  @UseGuards(JwtAuthGuard)
+  async restoreAccess(
+    @AuthUser() user: User,
+    @AuthWorkspace() workspace: Workspace,
+    @Body() body: { userId: string },
+  ) {
+    if (user.role !== 'admin' && user.role !== 'owner') {
+      throw new ForbiddenException();
+    }
+
+    const targetUser = await this.db
+      .selectFrom('users')
+      .select(['email'])
+      .where('id', '=', body.userId)
+      .executeTakeFirst();
+
+    if (!targetUser) {
+      throw new NotFoundException();
+    }
+
+    const billing = await this.billingService.findBillingByUserId(body.userId);
+    if (!billing) {
+      throw new NotFoundException('No billing record found');
+    }
+
+    const spaceId =
+      billing.gateway === 'kiwify'
+        ? this.environmentService.getKiwifyClientSpaceId()
+        : this.environmentService.getClientSpaceId();
+
+    await this.userProvisioningService.unlock(
+      targetUser.email,
+      workspace.id,
+      spaceId,
+    );
+    return { success: true };
   }
 }

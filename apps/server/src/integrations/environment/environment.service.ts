@@ -190,6 +190,14 @@ export class EnvironmentService {
     return this.configService.get<string>('STRIPE_WEBHOOK_SECRET');
   }
 
+  getClientSpaceId(): string {
+    return this.configService.get<string>('CLIENT_SPACE_ID');
+  }
+
+  getKiwifyClientSpaceId(): string {
+    return this.configService.get<string>('KIWIFY_CLIENT_SPACE_ID');
+  }
+
   getBillingTrialDays(): number {
     return parseInt(this.configService.get<string>('BILLING_TRIAL_DAYS', '14'));
   }
