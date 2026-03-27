@@ -125,6 +125,22 @@ export class S3Driver implements StorageDriver {
     }
   }
 
+  async readStreamRange(filePath: string, start: number, end: number): Promise<Readable> {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: this.config.bucket,
+        Key: filePath,
+        Range: `bytes=${start}-${end}`,
+      });
+
+      const response = await this.s3Client.send(command);
+
+      return response.Body as Readable;
+    } catch (err) {
+      throw new Error(`Failed to read file range from S3: ${(err as Error).message}`);
+    }
+  }
+
   async exists(filePath: string): Promise<boolean> {
     try {
       const command = new HeadObjectCommand({

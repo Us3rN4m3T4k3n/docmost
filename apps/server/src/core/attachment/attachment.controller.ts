@@ -151,6 +151,7 @@ export class AttachmentController {
   @UseGuards(JwtAuthGuard)
   @Get('/files/:fileId/:fileName')
   async getFile(
+    @Req() req: any,
     @Res() res: FastifyReply,
     @AuthUser() user: User,
     @AuthWorkspace() workspace: Workspace,
@@ -181,11 +182,40 @@ export class AttachmentController {
     }
 
     try {
+      const rangeHeader = req.headers['range'];
+      const fileSize = attachment.fileSize;
+
+      if (rangeHeader && fileSize) {
+        const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
+        if (!match) {
+          res.status(416).header('Content-Range', `bytes */${fileSize}`).send();
+          return;
+        }
+        const start = parseInt(match[1], 10);
+        const end = match[2] ? parseInt(match[2], 10) : fileSize - 1;
+        const chunkSize = end - start + 1;
+
+        const fileStream = await this.storageService.readStreamRange(attachment.filePath, start, end);
+        res.status(206).headers({
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunkSize,
+          'Content-Type': attachment.mimeType,
+          'Cache-Control': 'private, max-age=3600',
+        });
+        return res.send(fileStream);
+      }
+
       const fileStream = await this.storageService.read(attachment.filePath);
       res.headers({
         'Content-Type': attachment.mimeType,
+        'Accept-Ranges': 'bytes',
         'Cache-Control': 'private, max-age=3600',
       });
+
+      if (fileSize) {
+        res.header('Content-Length', fileSize);
+      }
 
       if (!inlineFileExtensions.includes(attachment.fileExt)) {
         res.header(
@@ -203,6 +233,7 @@ export class AttachmentController {
 
   @Get('/files/public/:fileId/:fileName')
   async getPublicFile(
+    @Req() req: any,
     @Res() res: FastifyReply,
     @AuthWorkspace() workspace: Workspace,
     @Param('fileId') fileId: string,
@@ -241,11 +272,40 @@ export class AttachmentController {
     }
 
     try {
+      const rangeHeader = req.headers['range'];
+      const fileSize = attachment.fileSize;
+
+      if (rangeHeader && fileSize) {
+        const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
+        if (!match) {
+          res.status(416).header('Content-Range', `bytes */${fileSize}`).send();
+          return;
+        }
+        const start = parseInt(match[1], 10);
+        const end = match[2] ? parseInt(match[2], 10) : fileSize - 1;
+        const chunkSize = end - start + 1;
+
+        const fileStream = await this.storageService.readStreamRange(attachment.filePath, start, end);
+        res.status(206).headers({
+          'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+          'Accept-Ranges': 'bytes',
+          'Content-Length': chunkSize,
+          'Content-Type': attachment.mimeType,
+          'Cache-Control': 'public, max-age=3600',
+        });
+        return res.send(fileStream);
+      }
+
       const fileStream = await this.storageService.read(attachment.filePath);
       res.headers({
         'Content-Type': attachment.mimeType,
+        'Accept-Ranges': 'bytes',
         'Cache-Control': 'public, max-age=3600',
       });
+
+      if (fileSize) {
+        res.header('Content-Length', fileSize);
+      }
 
       if (!inlineFileExtensions.includes(attachment.fileExt)) {
         res.header(

@@ -11,6 +11,8 @@ export interface StorageDriver {
 
   readStream(filePath: string): Promise<Readable>;
 
+  readStreamRange(filePath: string, start: number, end: number): Promise<Readable>;
+
   exists(filePath: string): Promise<boolean>;
 
   getUrl(filePath: string): string;
