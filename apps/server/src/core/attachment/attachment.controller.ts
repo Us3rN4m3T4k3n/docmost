@@ -183,7 +183,7 @@ export class AttachmentController {
 
     try {
       const rangeHeader = req.headers['range'];
-      const fileSize = attachment.fileSize;
+      const fileSize = attachment.fileSize ? Number(attachment.fileSize) : null;
 
       if (rangeHeader && fileSize) {
         const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
@@ -273,7 +273,7 @@ export class AttachmentController {
 
     try {
       const rangeHeader = req.headers['range'];
-      const fileSize = attachment.fileSize;
+      const fileSize = attachment.fileSize ? Number(attachment.fileSize) : null;
 
       if (rangeHeader && fileSize) {
         const match = rangeHeader.match(/bytes=(\d+)-(\d*)/);
