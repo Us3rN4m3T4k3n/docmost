@@ -13,7 +13,7 @@ RUN pnpm build
 
 FROM base AS installer
 
-RUN apk add --no-cache curl bash
+RUN apk add --no-cache curl bash su-exec
 
 WORKDIR /app
 
@@ -44,6 +44,12 @@ RUN pnpm install --frozen-lockfile
 
 RUN mkdir -p /app/data/storage
 
+# Switch back to root to copy and configure the entrypoint script
+USER root
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 EXPOSE 8080
 
-CMD ["pnpm", "--filter", "server", "start:prod"]
+# entrypoint.sh runs as root, fixes volume permissions, then execs as node
+ENTRYPOINT ["/entrypoint.sh"]
