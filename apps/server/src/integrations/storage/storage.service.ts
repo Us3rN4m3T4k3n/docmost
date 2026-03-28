@@ -33,6 +33,10 @@ export class StorageService {
     return this.storageDriver.readStream(filePath);
   }
 
+  async readStreamRange(filePath: string, start: number, end: number): Promise<Readable> {
+    return this.storageDriver.readStreamRange(filePath, start, end);
+  }
+
   async exists(filePath: string): Promise<boolean> {
     return this.storageDriver.exists(filePath);
   }
