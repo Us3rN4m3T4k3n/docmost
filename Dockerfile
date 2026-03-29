@@ -44,6 +44,10 @@ RUN pnpm install --frozen-lockfile
 
 RUN mkdir -p /app/data/storage
 
+# Switch back to root so the server process can write to the Railway volume
+# mounted at /app/data/storage, which is owned by root at container start time.
+USER root
+
 EXPOSE 8080
 
 CMD ["pnpm", "--filter", "server", "start:prod"]
